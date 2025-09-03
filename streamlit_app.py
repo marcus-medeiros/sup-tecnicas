@@ -74,21 +74,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
-import streamlit as st
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import matplotlib.pyplot as plt # Importar Matplotlib
 
-# --- Configuração da Página ---
-st.set_page_config(
-    page_title="Dashboard Elétrico - Melhor Distribuição",
-    page_icon="⚡",
-    layout="wide"
-)
-
-st.title("Dashboard de Monitoramento Elétrico - Melhor Visualização")
-st.markdown(f"Exibindo dados gerados em tempo real. Última atualização: {datetime.now().strftime('%H:%M:%S')}")
 
     # --- 1. Geração de Dados Elétricos Complexos ---
     @st.cache_data
