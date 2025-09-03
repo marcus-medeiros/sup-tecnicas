@@ -116,16 +116,16 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # A função st.checkbox retorna True se a caixa estiver marcada, e False caso contrário.
     # O argumento 'value=True' faz com que a caixa já comece marcada.
     with col1:
-        if st.checkbox('Fase A (Sensor 1)', value=True):
-            fases_selecionadas.append('Fase A (Sensor 1)')
+        if st.checkbox('Fase A', value=True):
+            fases_selecionadas.append('Fase A')
 
     with col2:
-        if st.checkbox('Fase B (Sensor 2)', value=True):
-            fases_selecionadas.append('Fase B (Sensor 2)')
+        if st.checkbox('Fase B', value=True):
+            fases_selecionadas.append('Fase B')
 
     with col3:
-        if st.checkbox('Fase C (Sensor 3)', value=True):
-            fases_selecionadas.append('Fase C (Sensor 3)')
+        if st.checkbox('Fase C', value=True):
+            fases_selecionadas.append('Fase C')
 
 
     # --- 3. Filtragem e Plotagem do Gráfico ---
