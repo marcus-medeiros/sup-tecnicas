@@ -70,6 +70,124 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
             
     """)
 
+
+# -----------------------------------------------------------------------
+# GERAL
+# -----------------------------------------------------------------------
+elif escolha_pagina == "Geral":
+    st.header("🖥️ Geral")
+    st.info("Abaixo está contido as informações de forma mais generalizada")
+
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col1:
+        st.info("COLUNA 1")
+        st.subheader("`st.line_chart`")
+        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.line_chart(chart_data)
+        st.code("st.line_chart(dados)")
+        st.divider()
+
+    with col2:
+        st.info("COLUNA 2")
+        st.subheader("`st.line_chart`")
+        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.line_chart(chart_data)
+        st.code("st.line_chart(dados)")
+        st.divider()
+
+
+    with col3:
+        st.info("COLUNA 3")
+        st.subheader("`st.line_chart`")
+        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.line_chart(chart_data)
+        st.code("st.line_chart(dados)")
+        st.divider()
+
+
+    st.subheader("`st.area_chart`")
+    st.markdown("Semelhante ao gráfico de linhas, mas preenche a área abaixo, útil para mostrar volumes cumulativos.")
+    st.area_chart(chart_data)
+    st.code("st.area_chart(dados)")
+    st.divider()
+    
+    st.subheader("`st.bar_chart`")
+    st.markdown("Excelente para comparar valores entre diferentes categorias.")
+    st.bar_chart(chart_data)
+    st.code("st.bar_chart(dados)")
+    st.divider()
+
+    st.subheader("`st.pyplot` (com Matplotlib) - CORRIGIDO")
+    st.markdown("Use para total customização. Agora mostrando um gráfico de dispersão para comparar as colunas 'a' e 'b', com a cor baseada na coluna 'c'.")
+    
+    # Criando a figura e os eixos com Matplotlib
+    fig, ax = plt.subplots(figsize=(8, 5))
+    
+    # Criando o gráfico de dispersão (scatter plot)
+    scatter = ax.scatter(
+        chart_data['a'], 
+        chart_data['b'], 
+        c=chart_data['c'], # Usa a coluna 'c' para definir a cor dos pontos
+        cmap='viridis'     # Define um mapa de cores
+    )
+    
+    # Adicionando rótulos, título e uma barra de cores
+    ax.set_xlabel("Eixo A")
+    ax.set_ylabel("Eixo B")
+    ax.set_title("Gráfico de Dispersão Customizado com Matplotlib")
+    ax.grid(True)
+    fig.colorbar(scatter, ax=ax, label="Valor de C")
+    
+    # Exibindo o gráfico no Streamlit
+    st.pyplot(fig)
+    
+    st.code("""
+import matplotlib.pyplot as plt
+
+# Criando a figura e os eixos
+fig, ax = plt.subplots()
+
+# Criando o gráfico de dispersão
+scatter = ax.scatter(
+    dados['a'], 
+    dados['b'], 
+    c=dados['c'], # Cor baseada na coluna 'c'
+    cmap='viridis'
+)
+
+# Adicionando customizações
+ax.set_xlabel("Eixo A")
+ax.set_ylabel("Eixo B")
+ax.set_title("Gráfico de Dispersão Customizado")
+ax.grid(True)
+fig.colorbar(scatter, ax=ax, label="Valor de C")
+
+# Exibindo no Streamlit
+st.pyplot(fig)
+    """)
+    st.divider()
+    
+    st.subheader("`st.plotly_chart`")
+    st.markdown("Ótimo para gráficos interativos (zoom, pan, tooltips) com poucas linhas de código.")
+    try:
+        import plotly.express as px
+        fig_plotly = px.scatter(
+            chart_data, 
+            x='a', 
+            y='b', 
+            color='c', 
+            title="Gráfico de Dispersão Interativo com Plotly"
+        )
+        st.plotly_chart(fig_plotly, use_container_width=True)
+    except ImportError:
+        st.warning("A biblioteca Plotly não está instalada. Execute: pip install plotly")
+    st.code("""
+import plotly.express as px
+fig = px.scatter(dados, x='a', y='b', color='c')
+st.plotly_chart(fig, use_container_width=True)
+    """)
+
+
 # -----------------------------------------------------------------------
 # ELEMENTOS DE TEXTO
 # -----------------------------------------------------------------------
