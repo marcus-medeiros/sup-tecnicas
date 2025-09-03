@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 
 chart_data = pd.DataFrame(
         np.random.randn(20, 3),
-        columns=['a', 'b', 'c']
+        columns=['Fase A', 'Fase B', 'Fase C']
     )
-
 
 # =======================================================================
 # CONFIGURAÇÃO DA PÁGINA
