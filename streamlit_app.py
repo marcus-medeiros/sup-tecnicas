@@ -112,7 +112,28 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     st.divider()
 
-# -----------------------------------------------------------------------
+    # =================================================================
+    # SOLUÇÕES DE VISUALIZAÇÃO
+    # =================================================================
+
+    # --- 2. Solução 1: Gráfico de Linha Simples ---
+    st.header("Solução 1: Gráfico de Linha Simples")
+    st.markdown("A forma mais rápida de visualizar os dados é com `st.line_chart`. Os 'saltos' entre as fases são claramente visíveis.")
+
+    # Para o st.line_chart, é melhor usar 'Passo' como índice
+    df_para_plot = df_fases.set_index('Passo')
+    st.line_chart(df_para_plot['Valor'])
+
+    st.code("""
+    # Usando 'Passo' como índice para o eixo X
+    df_para_plot = df_fases.set_index('Passo')
+
+    # Plot simples
+    st.line_chart(df_para_plot['Valor'])
+    """)
+
+    st.divider()
+    # -----------------------------------------------------------------------
 # GERAL
 # -----------------------------------------------------------------------
 elif escolha_pagina == "GERAL":
