@@ -136,6 +136,7 @@ elif escolha_pagina == "GERAL":
             col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
     st.divider()
 
+    st.header("Fator de Potência")
     fp_a = 0.82
     fp_b = 0.83
     fp_c = 0.84
