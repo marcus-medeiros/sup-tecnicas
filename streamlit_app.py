@@ -149,9 +149,9 @@ elif escolha_pagina == "GERAL":
 
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("FP (A)", f"{fp_a:.2f} W", f"{rel_fp_a:.2f}| Média: {media_fp:.2f}")
-    col2.metric("FP (B)", f"{fp_b:.2f} W", f"{rel_fp_b:.2f}| Média: {media_fp:.2f}")
-    col3.metric("FP (C)", f"{fp_c:.2f} W", f"{rel_fp_c:.2f}| Média: {media_fp:.2f}")
+    col1.metric("FP (A)", f"{fp_a:.2f}", f"{rel_fp_a:.2f}| Média: {media_fp:.2f}")
+    col2.metric("FP (B)", f"{fp_b:.2f}", f"{rel_fp_b:.2f}| Média: {media_fp:.2f}")
+    col3.metric("FP (C)", f"{fp_c:.2f}", f"{rel_fp_c:.2f}| Média: {media_fp:.2f}")
     st.divider()
 
     col1, col2, col3 = st.columns([1, 1, 1])
