@@ -136,9 +136,22 @@ elif escolha_pagina == "GERAL":
             col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
     st.divider()
 
-    
+    fp_a = 0.82
+    fp_b = 0.83
+    fp_c = 0.84
+
+    media_fp = (fp_a + fp_b + fp_c)/3
+
+    rel_fp_a = fp_a - media_fp
+    rel_fp_b = fp_b - media_fp
+    rel_fp_c = fp_b - media_fp
 
 
+    col1, col2, col3 = st.columns(3)
+    col1.metric("FP (A)", f"{fp_a:.2f} W", f"{rel_fp_a:.2f}| Média: {media_fp:.2f}")
+    col2.metric("FP (B)", f"{fp_b:.2f} W", f"{rel_fp_b:.2f}| Média: {media_fp:.2f}")
+    col3.metric("FP (C)", f"{fp_c:.2f} W", f"{rel_fp_c:.2f}| Média: {media_fp:.2f}")
+    st.divider()
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
@@ -155,20 +168,6 @@ elif escolha_pagina == "GERAL":
         st.subheader("POTÊNCIA APARENTE")
         st.line_chart(chart_data)
         st.divider()
-
-    st.subheader("`st.area_chart`")
-    st.markdown("Semelhante ao gráfico de linhas, mas preenche a área abaixo, útil para mostrar volumes cumulativos.")
-    st.area_chart(chart_data)
-    st.code("st.area_chart(dados)")
-    st.divider()
-    
-    st.subheader("`st.bar_chart`")
-    st.markdown("Excelente para comparar valores entre diferentes categorias.")
-    st.bar_chart(chart_data)
-    st.code("st.bar_chart(dados)")
-    st.divider()
-
-
 
 # -----------------------------------------------------------------------
 # ELEMENTOS DE TEXTO
