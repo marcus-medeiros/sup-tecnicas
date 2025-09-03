@@ -10,52 +10,11 @@ import matplotlib.pyplot as plt
 # st.set_page_config() deve ser o primeiro comando Streamlit no script.
 # =======================================================================
 st.set_page_config(
-    page_title="Guia Completo Streamlit",
-    page_icon="📚",
+    page_title="Técnicas de Medição",
+    page_icon=":zap:",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# =======================================================================
-# DADOS DE EXEMPLO (PARA GRÁFICOS, TABELAS E MAPAS)
-# =======================================================================
-# =======================================================================
-# DADOS DE EXEMPLO (PARA GRÁFICOS, TABELAS E MAPAS)
-# =======================================================================
-@st.cache_data
-def carregar_dados():
-    # Dados para gráficos
-    chart_data = pd.DataFrame(
-        np.random.randn(20, 3),
-        columns=['a', 'b', 'c']
-    )
-    
-    # --- DADOS DO MAPA CORRIGIDOS ---
-    # Gerando 200 pontos de dados espalhados aleatoriamente pelo Brasil
-    LAT_RANGE = [-33.75, 5.27]   # Latitude (do Sul ao Norte)
-    LON_RANGE = [-73.99, -34.79] # Longitude (do Oeste ao Leste)
-    
-    latitudes = np.random.uniform(LAT_RANGE[0], LAT_RANGE[1], 200)
-    longitudes = np.random.uniform(LON_RANGE[0], LON_RANGE[1], 200)
-    
-    map_data = pd.DataFrame({
-        'lat': latitudes,
-        'lon': longitudes
-    })
-    
-    map_data['tooltip'] = [f"Evento Aleatório {i}" for i in range(len(map_data))]
-    map_data['magnitude'] = np.random.randint(1, 100, size=len(map_data))
-    
-    return chart_data, map_data
-
-chart_data, map_data = carregar_dados()
-
-
-# Criando alguns pontos de exemplo
-df = pd.DataFrame({
-    'lat': [-23.5505, -22.9068, -25.4284],
-    'lon': [-46.6333, -43.1729, -49.2733]
-})
 
 # =======================================================================
 # BARRA LATERAL (SIDEBAR) PARA NAVEGAÇÃO
@@ -68,18 +27,15 @@ with st.sidebar:
         "Navegue pelas seções:",
         [
             "Página Inicial",
-            "Elementos de Texto",
-            "Exibição de Dados",
-            "Gráficos",
-            "Widgets Interativos (Inputs)",
-            "Layout e Contêineres",
-            "Mídia",
-            "Status e Progresso",
-            "Otimização e Estado"
+            "GERAL"
+            "FASE A",
+            "FASE B",
+            "FASE C",
+            "Outro"
         ]
     )
     st.markdown("---")
-    st.info("Esta é uma demonstração de todas as principais funcionalidades do Streamlit.")
+    st.info("Escolha uma opção")
 
 # =======================================================================
 # CONTEÚDO DAS PÁGINAS
