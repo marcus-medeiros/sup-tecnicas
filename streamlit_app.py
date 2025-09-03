@@ -116,6 +116,7 @@ elif escolha_pagina == "GERAL":
         with st.container():
             st.write("Gráfico 1")
             st.bar_chart(np.random.randn(20, 3))
+            st.line_chart(np.random.randn(20, 3))
 
     with col2:
         with st.container():
