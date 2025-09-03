@@ -103,7 +103,15 @@ elif escolha_pagina == "GERAL":
         st.divider()
 
 
-    
+    st.header("Análise das Potências")
+    st.markdown("Analisando-se as potências, pode-se analisar-se seus valores atuais, estimativas de fator de potência, assim como seus máximos")
+
+    st.header("Potências Máximas")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Potência Ativa", "1250 W", "1.2 °C")
+    col2.metric("Potência Reativa", "800 var", "-8%")
+    col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
+
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
