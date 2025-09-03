@@ -48,28 +48,26 @@ if escolha_pagina == "Página Inicial":
     As despesas com energia elétrica nas atividades comerciais e industriais se apresentam como um dos maiores insumos
 para o setor produtivo. Em diversos empreendimentos, não há um sistema que indique qual o consumo diário e quais
 atividades consomem mais energia elétrica, ficando as empresas limitadas às análises das contas de energia elétrica.
+                
+
 A instalação de um Sistema de Monitoramento em tempo real pode auxiliar as empresas nos rastreios dos custos de
 energia elétrica total ou parcial dos seus processos, auxiliando os empresários no cálculo do custo de energia elétrica
 agregado a cada produto ou processo.
+                
+
 Um Sistema de Monitoramento de Energia Elétrica com supervisório funciona por meio da coleta e monitoração de
 dados de consumo de energia elétrica em tempo real, com análise, processamento dos dados e apresentação dos
 resultados numérica e graficamente, na forma de grandezas energéticas que caracterizam o uso da energia elétrica
 das instalações.
+                
+
 Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Demandas Ativa, Reativa e Aparente, armazenando os valores máximos ocorridos;
 - Energias Ativa, Reativa e Aparente;
 - Fator de Potência, armazenando sua natureza capacitiva ou indutiva bem como valores mínimos ocorridos;
 - Tensões de linha e de fase; e
 - Correntes
-                
-
-                
-    ### O que você encontrará aqui:
-    - **Exemplos práticos** de cada função.
-    - **Código-fonte** para cada exemplo, pronto para copiar e colar.
-    - **Dicas** sobre quando usar cada componente.
-
-    Vamos começar! Escolha uma seção no menu para explorar.
+            
     """)
 
 # -----------------------------------------------------------------------
