@@ -117,7 +117,7 @@ elif escolha_pagina == "GERAL":
             st.subheader("Fase A")
             col1, col2, col3 = st.columns(3)
             relacao_pw_a = pot_ativa_max_a - media_pw
-            col1.metric("Potência Ativa", f"{pot_ativa_max_a} W", "{relacao_pw_a} W")
+            col1.metric("Potência Ativa", f"{pot_ativa_max_a} W", f"{relacao_pw_a} W")
             col2.metric("Potência Reativa", "800 var", "-8%")
             col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
     with tab2:
