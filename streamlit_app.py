@@ -126,7 +126,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     # --- 3. Filtragem e Plotagem do Gráfico ---
     st.header("Análise de Gráficos")
-    st.subheader("Tensões")
+    st.subheader("📈 Tensões")
 
     if not fases_selecionadas:
         st.warning("Por favor, selecione pelo menos uma fase para exibir o gráfico.")
