@@ -81,34 +81,22 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 # -----------------------------------------------------------------------
 elif escolha_pagina == "GERAL":
     st.header("🖥️ Geral")
-    st.info("Abaixo está contido as informações de forma mais generalizada")
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
-        st.info("COLUNA 1")
-        st.subheader("`st.line_chart`")
-        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.title("POTÊNCIA ATIVA")
         st.line_chart(chart_data)
-        st.code("st.line_chart(dados)")
         st.divider()
 
     with col2:
-        st.info("COLUNA 2")
-        st.subheader("`st.line_chart`")
-        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.title("POTÊNCIA REATIVA")
         st.line_chart(chart_data)
-        st.code("st.line_chart(dados)")
         st.divider()
-
 
     with col3:
-        st.info("COLUNA 3")
-        st.subheader("`st.line_chart`")
-        st.markdown("Ideal para visualizar dados ao longo do tempo ou de uma sequência contínua.")
+        st.title("POTÊNCIA APARENTE")
         st.line_chart(chart_data)
-        st.code("st.line_chart(dados)")
         st.divider()
-
 
     st.subheader("`st.area_chart`")
     st.markdown("Semelhante ao gráfico de linhas, mas preenche a área abaixo, útil para mostrar volumes cumulativos.")
