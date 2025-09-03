@@ -32,9 +32,6 @@ with st.sidebar:
         [
             "Página Inicial",
             "GERAL",
-            "FASE A",
-            "FASE B",
-            "FASE C",
             "Outro"
         ]
     )
