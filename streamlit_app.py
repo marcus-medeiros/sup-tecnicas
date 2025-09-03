@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import time
 import matplotlib.pyplot as plt
-import pydeck as pdk
+
 
 # =======================================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -71,7 +71,6 @@ with st.sidebar:
             "Elementos de Texto",
             "Exibição de Dados",
             "Gráficos",
-            "Mapas",
             "Widgets Interativos (Inputs)",
             "Layout e Contêineres",
             "Mídia",
@@ -279,93 +278,6 @@ fig = px.scatter(dados, x='a', y='b', color='c')
 st.plotly_chart(fig, use_container_width=True)
     """)
 
-
-# -----------------------------------------------------------------------
-# MAPAS
-# -----------------------------------------------------------------------
-elif escolha_pagina == "Mapas":
-    st.header("🗺️ Mapas")
-    
-    st.subheader("`st.map`")
-    st.markdown("A forma mais simples de colocar pontos em um mapa. Ótima para visualizações rápidas.")
-    st.map(map_data, zoom=3)
-    st.code("st.map(map_data, zoom=3)")
-    st.divider()
-    
-    st.map(df)
-    st.divider()
-
-    MAPBOX_TOKEN = "pk.eyJ1IjoibXZtc29ydGUiLCJhIjoiY21laXY4MzIxMDZrbzJyb2Q0aXFhbGh4bSJ9.PH2sx9UgmR_FW_p6AaigJw"
-
-    # =_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_
-    # GEOJSON SIMPLIFICADO PARA O ESTADO DE SÃO PAULO (~100 PONTOS)
-    # Esta versão é uma aproximação do contorno real, com muito menos detalhes.
-    # =_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_=_
-    geojson_sp_simplificado = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "properties": {"nome": "São Paulo"},
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [[
-                        [-51.55, -19.85], [-51.05, -19.95], [-50.55, -20.15], [-50.05, -20.35],
-                        [-49.55, -20.55], [-49.05, -20.95], [-48.55, -21.35], [-48.05, -21.65],
-                        [-47.55, -21.95], [-47.05, -22.25], [-46.55, -22.55], [-46.05, -22.85],
-                        [-45.55, -23.15], [-45.05, -23.45], [-44.85, -23.5], [-44.75, -23.6],
-                        [-44.7, -23.7], [-44.75, -23.8], [-44.85, -23.9], [-44.95, -24.0],
-                        [-45.1, -24.1], [-45.3, -24.2], [-45.5, -24.3], [-45.7, -24.4],
-                        [-45.9, -24.5], [-46.1, -24.6], [-46.3, -24.7], [-46.5, -24.8],
-                        [-46.7, -24.9], [-46.9, -25.0], [-47.1, -25.1], [-47.3, -25.2],
-                        [-47.5, -25.25], [-47.7, -25.3], [-47.9, -25.35], [-48.1, -25.4],
-                        [-48.3, -25.4], [-48.5, -25.35], [-48.7, -25.3], [-48.9, -25.25],
-                        [-49.1, -25.2], [-49.3, -25.15], [-49.5, -25.1], [-49.7, -25.05],
-                        [-49.9, -25.0], [-50.1, -24.9], [-50.3, -24.8], [-50.5, -24.7],
-                        [-50.7, -24.6], [-50.9, -24.5], [-51.1, -24.4], [-51.3, -24.3],
-                        [-51.5, -24.2], [-51.7, -24.1], [-51.9, -24.0], [-52.1, -23.9],
-                        [-52.3, -23.8], [-52.5, -23.7], [-52.7, -23.6], [-52.9, -23.5],
-                        [-53.1, -23.3], [-53.1, -23.1], [-53.05, -22.9], [-52.95, -22.7],
-                        [-52.85, -22.5], [-52.75, -22.3], [-52.65, -22.1], [-52.55, -21.9],
-                        [-52.45, -21.7], [-52.3, -21.5], [-52.15, -21.3], [-52.0, -21.1],
-                        [-51.85, -20.9], [-51.7, -20.7], [-51.6, -20.5], [-51.5, -20.3],
-                        [-51.45, -20.1], [-51.55, -19.85]
-                    ]]
-                }
-            }
-        ]
-    }
-
-    # Define a visualização inicial do mapa
-    view_state = pdk.ViewState(
-        latitude=-22.5,
-        longitude=-48.6,
-        zoom=5.5,
-        pitch=0
-    )
-
-    # Define a camada GeoJsonLayer
-    geojson_layer = pdk.Layer(
-        'GeoJsonLayer',
-        data=geojson_sp_simplificado, # Usando o geojson simplificado
-        opacity=0.4,
-        stroked=True,
-        filled=True,
-        get_fill_color='[65, 105, 225]',
-        get_line_color='[0, 0, 139]',
-        get_line_width=2500,
-    )
-
-    # Monta o objeto Deck, passando a chave carregada dos segredos
-    r = pdk.Deck(
-        layers=[geojson_layer],
-        initial_view_state=view_state,
-        map_style=pdk.map_styles.MAPBOX_LIGHT,
-        mapbox_key= MAPBOX_TOKEN # Usa a chave que buscamos com st.secrets
-    )
-
-    # Renderiza o mapa
-    st.pydeck_chart(r)
 
 # -----------------------------------------------------------------------
 # WIDGETS INTERATIVOS
