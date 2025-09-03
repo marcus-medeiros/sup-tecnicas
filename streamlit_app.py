@@ -82,8 +82,6 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 elif escolha_pagina == "GERAL":
     st.header("🖥️ Geral")
 
-
-
     st.header("Análise das Tensões e Correntes")
 
     col1, col2 = st.columns(2)
@@ -108,22 +106,26 @@ elif escolha_pagina == "GERAL":
 
     st.header("Potências Máximas")
 
-    a_max = 50
-    b_max = 60
-    c_max = 70
+    pot_ativa_max_a = 10
+    pot_ativa_max_b = 12
+    pot_ativa_max_c = 15
 
-    dados = {
-    "Fase": ["A", "B", "C"],
-    "Potência Máxima": [a_max, b_max, c_max],
-    }
+    media_pw = (pot_ativa_max_a + pot_ativa_max_b + pot_ativa_max_c)/3
 
-    st.table(dados)
+    tab1, tab2, tab3 = st.tabs(["Fase A", "Fase B", "Fase C"])
+    with tab1:
+            st.subheader("Fase A")
+            col1, col2, col3 = st.columns(3)
+            relacao_pw_a = pot_ativa_max_a - media_pw
+            col1.metric("Potência Ativa", f"{pot_ativa_max_a} W", "{relacao_pw_a} W")
+            col2.metric("Potência Reativa", "800 var", "-8%")
+            col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
+    with tab2:
+        st.line_chart(chart_data)
+    st.divider()
 
+    
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Potência Ativa", "1250 W", "1.2 °C")
-    col2.metric("Potência Reativa", "800 var", "-8%")
-    col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
 
 
     col1, col2, col3 = st.columns([1, 1, 1])
