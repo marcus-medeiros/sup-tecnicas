@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 chart_data = pd.DataFrame(
         np.random.randn(20, 3),
@@ -73,93 +74,103 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
-    st.title("Visualizando e Analisando Dados com Fases Distintas")
 
-    # --- 1. Geração dos Dados ---
-    # Função para criar o DataFrame com as 3 fases
-    def gerar_dados_fases(pontos_por_fase=20):
-        # Fase 1: valores entre 120 e 128
-        fase1 = np.random.uniform(120, 128, size=pontos_por_fase)
+    # --- 1. Geração de Dados com Timestamp ---
+    # Usamos o cache para não gerar novos dados aleatórios a cada interação do filtro
+    @st.cache_data
+    def gerar_dados_timestamp(n_pontos=100, freq='S'):
+        """
+        Gera um DataFrame onde o índice é um timestamp e cada coluna representa uma fase.
+        """
+        # Cria uma série de timestamps terminando no momento atual
+        timestamps = pd.date_range(
+            end=datetime.now(), 
+            periods=n_pontos, 
+            freq=freq  # 'S' para segundos, 'T' para minutos, 'H' para horas
+        )
         
-        # Fase 2: valores entre 220 e 228
-        fase2 = np.random.uniform(220, 228, size=pontos_por_fase)
+        # Cria os dados para cada fase
+        dados = {
+            'Fase A (Sensor 1)': np.random.uniform(120, 128, size=n_pontos),
+            'Fase B (Sensor 2)': np.random.uniform(220, 228, size=n_pontos),
+            'Fase C (Sensor 3)': np.random.uniform(330, 337, size=n_pontos)
+        }
         
-        # Fase 3: valores entre 330 e 337
-        fase3 = np.random.uniform(330, 337, size=pontos_por_fase)
-        
-        # Concatena os valores de todas as fases
-        valores = np.concatenate([fase1, fase2, fase3])
-        
-        # Cria uma coluna para identificar a fase de cada ponto
-        fases = (['Fase 1'] * pontos_por_fase + 
-                ['Fase 2'] * pontos_por_fase + 
-                ['Fase 3'] * pontos_por_fase)
-        
-        # Cria o DataFrame
-        df = pd.DataFrame({
-            'Passo': range(len(valores)),
-            'Fase': fases,
-            'Valor': valores
-        })
+        # Cria o DataFrame com os timestamps como índice
+        df = pd.DataFrame(dados, index=timestamps)
         return df
 
-    # Gera e exibe a tabela de dados
-    df_fases = gerar_dados_fases(pontos_por_fase=20)
+    # Gera os dados
+    df_original = gerar_dados_timestamp(n_pontos=120, freq='S') # 120 segundos de dados
 
-    with st.expander("Clique para ver a tabela de dados gerada"):
-        st.dataframe(df_fases)
 
+    # --- 2. Widget de Filtro Interativo ---
+    st.header("Filtro de Fases")
+    st.markdown("Use a caixa de seleção abaixo para escolher quais fases (sensores) exibir no gráfico.")
+
+    # As opções do filtro agora são os nomes das colunas do DataFrame
+    lista_de_fases = df_original.columns.tolist()
+
+    # Cria o widget multiselect
+    fases_selecionadas = st.multiselect(
+        label="Selecione as fases para monitorar:",
+        options=lista_de_fases,
+        default=lista_de_fases  # Todas as fases vêm selecionadas por padrão
+    )
+
+
+    # --- 3. Filtragem e Plotagem do Gráfico ---
+    st.header("Gráfico de Monitoramento")
+
+    # Verifica se o usuário selecionou alguma fase
+    if not fases_selecionadas:
+        st.warning("Por favor, selecione pelo menos uma fase para exibir o gráfico.")
+    else:
+        # A filtragem agora é mais simples: basta selecionar as colunas do DataFrame
+        df_filtrado = df_original[fases_selecionadas]
+        
+        st.markdown(f"Exibindo dados para: **{', '.join(fases_selecionadas)}**")
+        
+        # st.line_chart entende automaticamente o índice de timestamp e o usa para o eixo X
+        st.line_chart(df_filtrado)
+        
+        with st.expander("Ver tabela de dados completa"):
+            # Mostra a tabela original com todas as colunas para contexto
+            st.dataframe(df_original, height=300)
 
     st.divider()
 
-    # =================================================================
-    # SOLUÇÕES DE VISUALIZAÇÃO
-    # =================================================================
-
-    # --- 2. Solução 1: Gráfico de Linha Simples ---
-    st.header("Solução 1: Gráfico de Linha Simples")
-    st.markdown("A forma mais rápida de visualizar os dados é com `st.line_chart`. Os 'saltos' entre as fases são claramente visíveis.")
-
-    # Para o st.line_chart, é melhor usar 'Passo' como índice
-    df_para_plot = df_fases.set_index('Passo')
-    st.line_chart(df_para_plot['Valor'])
-
+    # --- 4. Explicação do Código ---
+    st.subheader("Como Funciona a Nova Lógica?")
+    st.markdown(
+        """
+        A principal mudança está na estrutura dos dados. Agora temos uma tabela "larga" (wide format):
+        - O **índice** da tabela é a coluna de tempo (`DatetimeIndex`).
+        - Cada **coluna** representa uma fase ou sensor diferente.
+        
+        Isso simplifica a filtragem. Em vez de filtrar linhas, nós simplesmente selecionamos as colunas que queremos plotar.
+        """
+    )
     st.code("""
-    # Usando 'Passo' como índice para o eixo X
-    df_para_plot = df_fases.set_index('Passo')
+    # 1. As opções do filtro são os nomes das colunas
+    lista_de_fases = df_original.columns.tolist()
 
-    # Plot simples
-    st.line_chart(df_para_plot['Valor'])
+    # 2. O usuário seleciona os nomes das colunas que deseja ver
+    fases_selecionadas = st.multiselect(
+        "Selecione as fases:",
+        options=lista_de_fases,
+        default=lista_de_fases
+    )
+
+    # 3. A filtragem é uma simples seleção de colunas do DataFrame
+    df_filtrado = df_original[fases_selecionadas]
+
+    # 4. st.line_chart plota o DataFrame filtrado, usando o índice de tempo para o eixo X
+    st.line_chart(df_filtrado)
     """)
 
-    st.divider()
 
-        # --- 4. Solução 3: Análise Estatística por Fase ---
-    st.header("Solução 3: Análise Estatística por Fase")
-    st.markdown("Além do gráfico, podemos usar o Pandas para agrupar os dados por fase e ver as estatísticas descritivas de cada uma.")
-
-    # Agrupa o DataFrame por 'Fase' e calcula as estatísticas com .describe()
-    estatisticas = df_fases.groupby('Fase')['Valor'].describe()
-
-    # Reordena as fases para garantir a ordem correta
-    estatisticas = estatisticas.reindex(['Fase 1', 'Fase 2', 'Fase 3'])
-
-    st.table(estatisticas)
-
-    st.markdown("Podemos também plotar um gráfico de barras com os valores médios de cada fase:")
-    st.bar_chart(estatisticas['mean'])
-
-    st.code("""
-    # Agrupa por fase e descreve os dados
-    estatisticas = df_fases.groupby('Fase')['Valor'].describe()
-
-    # Exibe a tabela
-    st.table(estatisticas)
-
-    # Plota um gráfico de barras com as médias
-    st.bar_chart(estatisticas['mean'])
-    """)
-    # -----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # GERAL
 # -----------------------------------------------------------------------
 elif escolha_pagina == "GERAL":
