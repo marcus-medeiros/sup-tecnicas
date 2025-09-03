@@ -121,7 +121,19 @@ elif escolha_pagina == "GERAL":
             col2.metric("Potência Reativa", "800 var", "-8%")
             col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
     with tab2:
-        st.line_chart(chart_data)
+            st.subheader("Fase B")
+            col1, col2, col3 = st.columns(3)
+            relacao_pw_a = pot_ativa_max_b - media_pw
+            col1.metric("Potência Ativa", f"{pot_ativa_max_a:.2f} W", f"{relacao_pw_a:.2f} W")
+            col2.metric("Potência Reativa", "800 var", "-8%")
+            col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
+    with tab3:
+            st.subheader("Fase C")
+            col1, col2, col3 = st.columns(3)
+            relacao_pw_a = pot_ativa_max_c - media_pw
+            col1.metric("Potência Ativa", f"{pot_ativa_max_a:.2f} W", f"{relacao_pw_a:.2f} W")
+            col2.metric("Potência Reativa", "800 var", "-8%")
+            col3.metric("Potência Aparente", "1500 VA", "12%", delta_color="inverse")
     st.divider()
 
     
