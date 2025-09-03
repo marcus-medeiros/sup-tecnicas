@@ -91,9 +91,9 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         
         # Cria os dados para cada fase
         dados = {
-            'Fase A (Sensor 1)': np.random.uniform(120, 128, size=n_pontos),
-            'Fase B (Sensor 2)': np.random.uniform(220, 228, size=n_pontos),
-            'Fase C (Sensor 3)': np.random.uniform(330, 337, size=n_pontos)
+            'Fase A': np.random.uniform(120, 128, size=n_pontos),
+            'Fase B': np.random.uniform(220, 228, size=n_pontos),
+            'Fase C': np.random.uniform(330, 337, size=n_pontos)
         }
         
         # Cria o DataFrame com os timestamps como índice
@@ -104,71 +104,77 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     df_original = gerar_dados_timestamp(n_pontos=120, freq='S') # 120 segundos de dados
 
 
-    # --- 2. Widget de Filtro Interativo ---
+    # --- 2. Widgets de Filtro com Checkboxes ---
     st.header("Filtro de Fases")
-    st.markdown("Use a caixa de seleção abaixo para escolher quais fases (sensores) exibir no gráfico.")
 
-    # As opções do filtro agora são os nomes das colunas do DataFrame
-    lista_de_fases = df_original.columns.tolist()
+    # Cria uma lista vazia para armazenar as fases selecionadas
+    fases_selecionadas = []
 
-    # Cria o widget multiselect
-    fases_selecionadas = st.multiselect(
-        label="Selecione as fases para monitorar:",
-        options=lista_de_fases,
-        default=lista_de_fases  # Todas as fases vêm selecionadas por padrão
-    )
+    # Para um layout mais organizado, usamos colunas
+    col1, col2, col3 = st.columns(3)
+
+    # A função st.checkbox retorna True se a caixa estiver marcada, e False caso contrário.
+    # O argumento 'value=True' faz com que a caixa já comece marcada.
+    with col1:
+        if st.checkbox('Fase A (Sensor 1)', value=True):
+            fases_selecionadas.append('Fase A (Sensor 1)')
+
+    with col2:
+        if st.checkbox('Fase B (Sensor 2)', value=True):
+            fases_selecionadas.append('Fase B (Sensor 2)')
+
+    with col3:
+        if st.checkbox('Fase C (Sensor 3)', value=True):
+            fases_selecionadas.append('Fase C (Sensor 3)')
 
 
     # --- 3. Filtragem e Plotagem do Gráfico ---
     st.header("Gráfico de Monitoramento")
 
-    # Verifica se o usuário selecionou alguma fase
     if not fases_selecionadas:
         st.warning("Por favor, selecione pelo menos uma fase para exibir o gráfico.")
     else:
-        # A filtragem agora é mais simples: basta selecionar as colunas do DataFrame
+        # A lógica de filtragem e plotagem é exatamente a mesma de antes
         df_filtrado = df_original[fases_selecionadas]
         
         st.markdown(f"Exibindo dados para: **{', '.join(fases_selecionadas)}**")
-        
-        # st.line_chart entende automaticamente o índice de timestamp e o usa para o eixo X
         st.line_chart(df_filtrado)
         
         with st.expander("Ver tabela de dados completa"):
-            # Mostra a tabela original com todas as colunas para contexto
             st.dataframe(df_original, height=300)
 
     st.divider()
 
     # --- 4. Explicação do Código ---
-    st.subheader("Como Funciona a Nova Lógica?")
-    st.markdown(
-        """
-        A principal mudança está na estrutura dos dados. Agora temos uma tabela "larga" (wide format):
-        - O **índice** da tabela é a coluna de tempo (`DatetimeIndex`).
-        - Cada **coluna** representa uma fase ou sensor diferente.
-        
-        Isso simplifica a filtragem. Em vez de filtrar linhas, nós simplesmente selecionamos as colunas que queremos plotar.
-        """
-    )
+    st.subheader("Como Funciona a Lógica com Checkbox?")
     st.code("""
-    # 1. As opções do filtro são os nomes das colunas
-    lista_de_fases = df_original.columns.tolist()
+    # 1. Inicia uma lista vazia
+    fases_selecionadas = []
 
-    # 2. O usuário seleciona os nomes das colunas que deseja ver
-    fases_selecionadas = st.multiselect(
-        "Selecione as fases:",
-        options=lista_de_fases,
-        default=lista_de_fases
-    )
+    # 2. Para cada fase, cria um checkbox.
+    # Se o checkbox retornar True (marcado), adiciona o nome da fase à lista.
+    if st.checkbox('Fase A', value=True):
+        fases_selecionadas.append('Fase A')
 
-    # 3. A filtragem é uma simples seleção de colunas do DataFrame
+    if st.checkbox('Fase B', value=True):
+        fases_selecionadas.append('Fase B')
+        
+    # ... e assim por diante
+
+    # 3. No final, 'fases_selecionadas' é uma lista com os nomes das
+    # colunas que o usuário quer ver (ex: ['Fase A', 'Fase B']).
+    # O resto do código (filtragem e plotagem) funciona da mesma forma.
     df_filtrado = df_original[fases_selecionadas]
-
-    # 4. st.line_chart plota o DataFrame filtrado, usando o índice de tempo para o eixo X
     st.line_chart(df_filtrado)
     """)
 
+    # --- 5. Comparativo ---
+    st.subheader("Checkbox vs. Multiselect: Qual Usar?")
+    st.markdown("""
+    - **Use Checkboxes** quando você tem **poucas opções (até umas 5 ou 6)** e quer que o controle seja muito direto e visível na tela. É ótimo para painéis de controle.
+
+    - **Use Multiselect** quando você tem **muitas opções** ou quando as opções são **dinâmicas** (vêm de uma base de dados e podem mudar). Ele economiza muito espaço na tela.
+    """)
 
 # -----------------------------------------------------------------------
 # GERAL
