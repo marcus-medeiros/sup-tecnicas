@@ -21,10 +21,10 @@ st.set_page_config(
 # =======================================================================
 with st.sidebar:
     st.image("https://streamlit.io/images/brand/streamlit-logo-secondary-colormark-darktext.png", width=200)
-    st.header("Guia Completo Streamlit")
+    st.header("MVM")
     
     escolha_pagina = st.radio(
-        "Navegue pelas seções:",
+        "Escolha uma opção:",
         [
             "Página Inicial",
             "GERAL",
@@ -35,7 +35,6 @@ with st.sidebar:
         ]
     )
     st.markdown("---")
-    st.info("Escolha uma opção")
 
 # =======================================================================
 # CONTEÚDO DAS PÁGINAS
