@@ -145,36 +145,6 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     st.divider()
 
-    # --- 4. Explicação do Código ---
-    st.subheader("Como Funciona a Lógica com Checkbox?")
-    st.code("""
-    # 1. Inicia uma lista vazia
-    fases_selecionadas = []
-
-    # 2. Para cada fase, cria um checkbox.
-    # Se o checkbox retornar True (marcado), adiciona o nome da fase à lista.
-    if st.checkbox('Fase A', value=True):
-        fases_selecionadas.append('Fase A')
-
-    if st.checkbox('Fase B', value=True):
-        fases_selecionadas.append('Fase B')
-        
-    # ... e assim por diante
-
-    # 3. No final, 'fases_selecionadas' é uma lista com os nomes das
-    # colunas que o usuário quer ver (ex: ['Fase A', 'Fase B']).
-    # O resto do código (filtragem e plotagem) funciona da mesma forma.
-    df_filtrado = df_original[fases_selecionadas]
-    st.line_chart(df_filtrado)
-    """)
-
-    # --- 5. Comparativo ---
-    st.subheader("Checkbox vs. Multiselect: Qual Usar?")
-    st.markdown("""
-    - **Use Checkboxes** quando você tem **poucas opções (até umas 5 ou 6)** e quer que o controle seja muito direto e visível na tela. É ótimo para painéis de controle.
-
-    - **Use Multiselect** quando você tem **muitas opções** ou quando as opções são **dinâmicas** (vêm de uma base de dados e podem mudar). Ele economiza muito espaço na tela.
-    """)
 
 # -----------------------------------------------------------------------
 # GERAL
