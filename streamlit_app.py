@@ -4,6 +4,11 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
+chart_data = pd.DataFrame(
+        np.random.randn(20, 3),
+        columns=['a', 'b', 'c']
+    )
+
 
 # =======================================================================
 # CONFIGURAÇÃO DA PÁGINA
