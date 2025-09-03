@@ -133,6 +133,32 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     """)
 
     st.divider()
+
+        # --- 4. Solução 3: Análise Estatística por Fase ---
+    st.header("Solução 3: Análise Estatística por Fase")
+    st.markdown("Além do gráfico, podemos usar o Pandas para agrupar os dados por fase e ver as estatísticas descritivas de cada uma.")
+
+    # Agrupa o DataFrame por 'Fase' e calcula as estatísticas com .describe()
+    estatisticas = df_fases.groupby('Fase')['Valor'].describe()
+
+    # Reordena as fases para garantir a ordem correta
+    estatisticas = estatisticas.reindex(['Fase 1', 'Fase 2', 'Fase 3'])
+
+    st.table(estatisticas)
+
+    st.markdown("Podemos também plotar um gráfico de barras com os valores médios de cada fase:")
+    st.bar_chart(estatisticas['mean'])
+
+    st.code("""
+    # Agrupa por fase e descreve os dados
+    estatisticas = df_fases.groupby('Fase')['Valor'].describe()
+
+    # Exibe a tabela
+    st.table(estatisticas)
+
+    # Plota um gráfico de barras com as médias
+    st.bar_chart(estatisticas['mean'])
+    """)
     # -----------------------------------------------------------------------
 # GERAL
 # -----------------------------------------------------------------------
