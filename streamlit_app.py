@@ -27,7 +27,7 @@ with st.sidebar:
         "Navegue pelas seções:",
         [
             "Página Inicial",
-            "GERAL"
+            "GERAL",
             "FASE A",
             "FASE B",
             "FASE C",
