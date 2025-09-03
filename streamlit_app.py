@@ -84,17 +84,17 @@ elif escolha_pagina == "GERAL":
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
-        st.title("POTÊNCIA ATIVA")
+        st.header("POTÊNCIA ATIVA")
         st.line_chart(chart_data)
         st.divider()
 
     with col2:
-        st.title("POTÊNCIA REATIVA")
+        st.header("POTÊNCIA REATIVA")
         st.line_chart(chart_data)
         st.divider()
 
     with col3:
-        st.title("POTÊNCIA APARENTE")
+        st.header("POTÊNCIA APARENTE")
         st.line_chart(chart_data)
         st.divider()
 
