@@ -74,6 +74,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
             
     """)
 
+    st.line_chart(chart_data)
 
 # -----------------------------------------------------------------------
 # GERAL
