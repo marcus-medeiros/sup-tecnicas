@@ -20,8 +20,7 @@ st.set_page_config(
 # BARRA LATERAL (SIDEBAR) PARA NAVEGAÇÃO
 # =======================================================================
 with st.sidebar:
-    st.image("https://streamlit.io/images/brand/streamlit-logo-secondary-colormark-darktext.png", width=200)
-    st.header("MVM")
+    st.image("Logo-MVM.png", width=200)
     
     escolha_pagina = st.radio(
         "Escolha uma opção:",
