@@ -20,7 +20,7 @@ st.set_page_config(
 # BARRA LATERAL (SIDEBAR) PARA NAVEGAÇÃO
 # =======================================================================
 with st.sidebar:
-    st.image("Logo_v2.png", width=200)
+    st.image("Logo_v2.png", width=100)
     
     escolha_pagina = st.radio(
         "Escolha uma opção:",
