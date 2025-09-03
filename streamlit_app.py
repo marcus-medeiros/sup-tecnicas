@@ -132,7 +132,6 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
 
     # --- 2. Filtro Principal (Mestre) ---
-    st.header("Filtro Principal de Fases")
     st.markdown("Selecione as fases que deseja visualizar em **todos** os gráficos abaixo.")
 
     sufixos_selecionados = []
@@ -198,7 +197,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     # --- 5. Seção de Potências (com Colunas) ---
     st.header("Potências")
-    col_ativa, col_reativa, col_aparente = st.columns(3)
+    col_ativa, col_reativa = st.columns(2)
 
     with col_ativa:
         st.subheader("Ativa (W)")
@@ -214,12 +213,11 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         if colunas_para_plotar:
             st.line_chart(df_original[colunas_para_plotar])
             
-    with col_aparente:
-        st.subheader("Aparente (VA)")
-        cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
-        colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
-        if colunas_para_plotar:
-            st.line_chart(df_original[colunas_para_plotar])
+    st.subheader("Aparente (VA)")
+    cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
+    colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
+    if colunas_para_plotar:
+        st.line_chart(df_original[colunas_para_plotar])
 
 
 # -----------------------------------------------------------------------
