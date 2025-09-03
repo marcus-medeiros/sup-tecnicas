@@ -75,6 +75,36 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
             
     """)
 
+    st.subheader("Controles dos Eixos Y")
+    
+    # --- Controle para Tensão de Fase ---
+    st.markdown("**Tensão de Fase (V)**")
+    auto_tensao_fase = st.checkbox("Eixo Automático", key="auto_tf", value=False)
+    col1_tf, col2_tf = st.columns(2)
+    with col1_tf:
+        y_min_tf = st.number_input("Mínimo", key="y_min_tf", value=115.0, step=1.0, format="%.1f", disabled=auto_tensao_fase)
+    with col2_tf:
+        y_max_tf = st.number_input("Máximo", key="y_max_tf", value=130.0, step=1.0, format="%.1f", disabled=auto_tensao_fase)
+
+    # --- Controle para Tensão de Linha ---
+    st.markdown("**Tensão de Linha (V)**")
+    auto_tensao_linha = st.checkbox("Eixo Automático", key="auto_tl", value=False)
+    col1_tl, col2_tl = st.columns(2)
+    with col1_tl:
+        y_min_tl = st.number_input("Mínimo", key="y_min_tl", value=210.0, step=1.0, format="%.1f", disabled=auto_tensao_linha)
+    with col2_tl:
+        y_max_tl = st.number_input("Máximo", key="y_max_tl", value=225.0, step=1.0, format="%.1f", disabled=auto_tensao_linha)
+
+    # --- Controle para Corrente ---
+    st.markdown("**Corrente (A)**")
+    auto_corrente = st.checkbox("Eixo Automático", key="auto_corr", value=True) # Deixar automático por padrão
+    col1_c, col2_c = st.columns(2)
+    with col1_c:
+        y_min_c = st.number_input("Mínimo", key="y_min_c", value=8.0, step=0.5, format="%.1f", disabled=auto_corrente)
+    with col2_c:
+        y_max_c = st.number_input("Máximo", key="y_max_c", value=15.0, step=0.5, format="%.1f", disabled=auto_corrente)
+
+
 
     # --- 1. Geração de Dados Elétricos Complexos ---
     @st.cache_data
