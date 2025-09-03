@@ -74,169 +74,152 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
-
-    # --- 1. Geração de Dados com Timestamp ---
-import streamlit as st
-import pandas as pd
-import numpy as np
-from datetime import datetime
-
-# --- Configuração da Página ---
-st.set_page_config(
-    page_title="Dashboard Elétrico",
-    page_icon="⚡",
-    layout="wide"
-)
-
-st.title("Dashboard de Monitoramento Elétrico")
-st.markdown(f"Exibindo dados gerados em tempo real. Última atualização: {datetime.now().strftime('%H:%M:%S')}")
-
-# --- 1. Geração de Dados Elétricos Complexos ---
-@st.cache_data
-def gerar_dados_eletricos(n_pontos=120, freq='S'):
-    """
-    Gera um DataFrame completo com dados elétricos para 3 fases.
-    """
-    timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq=freq)
-    
-    # Gerando dados base com alguma variabilidade
-    tensao_fase_a = np.random.uniform(125, 128, size=n_pontos)
-    tensao_fase_b = np.random.uniform(126, 129, size=n_pontos)
-    tensao_fase_c = np.random.uniform(124, 127, size=n_pontos)
-    
-    corrente_a = np.random.uniform(10, 12, size=n_pontos)
-    corrente_b = np.random.uniform(9, 11, size=n_pontos)
-    corrente_c = np.random.uniform(11, 13, size=n_pontos)
-    
-    # Fator de potência (geralmente entre 0.85 e 0.95)
-    fp = 0.92
-    
-    dados = {
-        # Tensões de Fase (ex: Fase-Neutro)
-        'Tensão Fase A': tensao_fase_a,
-        'Tensão Fase B': tensao_fase_b,
-        'Tensão Fase C': tensao_fase_c,
+    # --- 1. Geração de Dados Elétricos Complexos ---
+    @st.cache_data
+    def gerar_dados_eletricos(n_pontos=120, freq='S'):
+        """
+        Gera um DataFrame completo com dados elétricos para 3 fases.
+        """
+        timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq=freq)
         
-        # Tensões de Linha (ex: Fase-Fase, ~ Tensão de Fase * sqrt(3))
-        'Tensão Linha AB': np.random.uniform(218, 222, size=n_pontos),
-        'Tensão Linha BC': np.random.uniform(219, 223, size=n_pontos),
-        'Tensão Linha CA': np.random.uniform(217, 221, size=n_pontos),
+        # Gerando dados base com alguma variabilidade
+        tensao_fase_a = np.random.uniform(125, 128, size=n_pontos)
+        tensao_fase_b = np.random.uniform(126, 129, size=n_pontos)
+        tensao_fase_c = np.random.uniform(124, 127, size=n_pontos)
         
-        # Correntes
-        'Corrente A': corrente_a,
-        'Corrente B': corrente_b,
-        'Corrente C': corrente_c,
+        corrente_a = np.random.uniform(10, 12, size=n_pontos)
+        corrente_b = np.random.uniform(9, 11, size=n_pontos)
+        corrente_c = np.random.uniform(11, 13, size=n_pontos)
         
-        # Potências (P = V*I*FP, Q = V*I*sin(acos(FP)), S = V*I)
-        'Potência Ativa A': tensao_fase_a * corrente_a * fp,
-        'Potência Ativa B': tensao_fase_b * corrente_b * fp,
-        'Potência Ativa C': tensao_fase_c * corrente_c * fp,
+        # Fator de potência (geralmente entre 0.85 e 0.95)
+        fp = 0.92
         
-        'Potência Reativa A': tensao_fase_a * corrente_a * np.sin(np.arccos(fp)),
-        'Potência Reativa B': tensao_fase_b * corrente_b * np.sin(np.arccos(fp)),
-        'Potência Reativa C': tensao_fase_c * corrente_c * np.sin(np.arccos(fp)),
+        dados = {
+            # Tensões de Fase (ex: Fase-Neutro)
+            'Tensão Fase A': tensao_fase_a,
+            'Tensão Fase B': tensao_fase_b,
+            'Tensão Fase C': tensao_fase_c,
+            
+            # Tensões de Linha (ex: Fase-Fase, ~ Tensão de Fase * sqrt(3))
+            'Tensão Linha AB': np.random.uniform(218, 222, size=n_pontos),
+            'Tensão Linha BC': np.random.uniform(219, 223, size=n_pontos),
+            'Tensão Linha CA': np.random.uniform(217, 221, size=n_pontos),
+            
+            # Correntes
+            'Corrente A': corrente_a,
+            'Corrente B': corrente_b,
+            'Corrente C': corrente_c,
+            
+            # Potências (P = V*I*FP, Q = V*I*sin(acos(FP)), S = V*I)
+            'Potência Ativa A': tensao_fase_a * corrente_a * fp,
+            'Potência Ativa B': tensao_fase_b * corrente_b * fp,
+            'Potência Ativa C': tensao_fase_c * corrente_c * fp,
+            
+            'Potência Reativa A': tensao_fase_a * corrente_a * np.sin(np.arccos(fp)),
+            'Potência Reativa B': tensao_fase_b * corrente_b * np.sin(np.arccos(fp)),
+            'Potência Reativa C': tensao_fase_c * corrente_c * np.sin(np.arccos(fp)),
+            
+            'Potência Aparente A': tensao_fase_a * corrente_a,
+            'Potência Aparente B': tensao_fase_b * corrente_b,
+            'Potência Aparente C': tensao_fase_c * corrente_c,
+        }
         
-        'Potência Aparente A': tensao_fase_a * corrente_a,
-        'Potência Aparente B': tensao_fase_b * corrente_b,
-        'Potência Aparente C': tensao_fase_c * corrente_c,
-    }
-    
-    df = pd.DataFrame(dados, index=timestamps)
-    return df
+        df = pd.DataFrame(dados, index=timestamps)
+        return df
 
-# Gera o DataFrame completo
-df_original = gerar_dados_eletricos()
+    # Gera o DataFrame completo
+    df_original = gerar_dados_eletricos()
 
 
-# --- 2. Filtro Principal (Mestre) ---
-st.header("Filtro Principal de Fases")
-st.markdown("Selecione as fases que deseja visualizar em **todos** os gráficos abaixo.")
+    # --- 2. Filtro Principal (Mestre) ---
+    st.header("Filtro Principal de Fases")
+    st.markdown("Selecione as fases que deseja visualizar em **todos** os gráficos abaixo.")
 
-sufixos_selecionados = []
-col1, col2, col3 = st.columns(3)
+    sufixos_selecionados = []
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    if st.checkbox('Fase A', value=True, key='fase_a'):
-        sufixos_selecionados.append('A')
-with col2:
-    if st.checkbox('Fase B', value=True, key='fase_b'):
-        sufixos_selecionados.append('B')
-with col3:
-    if st.checkbox('Fase C', value=True, key='fase_c'):
-        sufixos_selecionados.append('C')
+    with col1:
+        if st.checkbox('Fase A', value=True, key='fase_a'):
+            sufixos_selecionados.append('A')
+    with col2:
+        if st.checkbox('Fase B', value=True, key='fase_b'):
+            sufixos_selecionados.append('B')
+    with col3:
+        if st.checkbox('Fase C', value=True, key='fase_c'):
+            sufixos_selecionados.append('C')
 
-# Se nenhuma fase for selecionada, exibe um aviso e para a execução.
-if not sufixos_selecionados:
-    st.warning("Por favor, selecione pelo menos uma fase para visualizar os dados.")
-    st.stop() # Interrompe a renderização do restante da página
+    # Se nenhuma fase for selecionada, exibe um aviso e para a execução.
+    if not sufixos_selecionados:
+        st.warning("Por favor, selecione pelo menos uma fase para visualizar os dados.")
+        st.stop() # Interrompe a renderização do restante da página
 
-st.divider()
+    st.divider()
 
 
-# --- 3. Seção de Tensões (com Tabs) ---
-st.header("Tensões")
+    # --- 3. Seção de Tensões (com Tabs) ---
+    st.header("Tensões")
 
-# Helper para filtrar colunas com base nos sufixos
-def filtrar_colunas(todas_as_colunas, sufixos):
-    colunas_filtradas = [col for col in todas_as_colunas if col.split()[-1] in sufixos]
-    return colunas_filtradas
+    # Helper para filtrar colunas com base nos sufixos
+    def filtrar_colunas(todas_as_colunas, sufixos):
+        colunas_filtradas = [col for col in todas_as_colunas if col.split()[-1] in sufixos]
+        return colunas_filtradas
 
-tab_fase, tab_linha = st.tabs(["Tensão de Fase (V)", "Tensão de Linha (V)"])
+    tab_fase, tab_linha = st.tabs(["Tensão de Fase (V)", "Tensão de Linha (V)"])
 
-with tab_fase:
-    cols_tensao_fase = ['Tensão Fase A', 'Tensão Fase B', 'Tensão Fase C']
-    colunas_para_plotar = filtrar_colunas(cols_tensao_fase, sufixos_selecionados)
+    with tab_fase:
+        cols_tensao_fase = ['Tensão Fase A', 'Tensão Fase B', 'Tensão Fase C']
+        colunas_para_plotar = filtrar_colunas(cols_tensao_fase, sufixos_selecionados)
+        if colunas_para_plotar:
+            st.line_chart(df_original[colunas_para_plotar])
+
+    with tab_linha:
+        # A lógica para tensão de linha é um pouco diferente (AB, BC, CA)
+        # Mostraremos as linhas que contêm os sufixos selecionados
+        cols_tensao_linha = ['Tensão Linha AB', 'Tensão Linha BC', 'Tensão Linha CA']
+        colunas_para_plotar = [
+            col for col in cols_tensao_linha 
+            if any(sufixo in col for sufixo in sufixos_selecionados)
+        ]
+        if colunas_para_plotar:
+            st.line_chart(df_original[colunas_para_plotar])
+
+    st.divider()
+
+
+    # --- 4. Seção de Corrente ---
+    st.header("Corrente (A)")
+    cols_corrente = ['Corrente A', 'Corrente B', 'Corrente C']
+    colunas_para_plotar = filtrar_colunas(cols_corrente, sufixos_selecionados)
     if colunas_para_plotar:
         st.line_chart(df_original[colunas_para_plotar])
 
-with tab_linha:
-    # A lógica para tensão de linha é um pouco diferente (AB, BC, CA)
-    # Mostraremos as linhas que contêm os sufixos selecionados
-    cols_tensao_linha = ['Tensão Linha AB', 'Tensão Linha BC', 'Tensão Linha CA']
-    colunas_para_plotar = [
-        col for col in cols_tensao_linha 
-        if any(sufixo in col for sufixo in sufixos_selecionados)
-    ]
-    if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
-
-st.divider()
+    st.divider()
 
 
-# --- 4. Seção de Corrente ---
-st.header("Corrente (A)")
-cols_corrente = ['Corrente A', 'Corrente B', 'Corrente C']
-colunas_para_plotar = filtrar_colunas(cols_corrente, sufixos_selecionados)
-if colunas_para_plotar:
-    st.line_chart(df_original[colunas_para_plotar])
+    # --- 5. Seção de Potências (com Colunas) ---
+    st.header("Potências")
+    col_ativa, col_reativa, col_aparente = st.columns(3)
 
-st.divider()
+    with col_ativa:
+        st.subheader("Ativa (W)")
+        cols_pot_ativa = ['Potência Ativa A', 'Potência Ativa B', 'Potência Ativa C']
+        colunas_para_plotar = filtrar_colunas(cols_pot_ativa, sufixos_selecionados)
+        if colunas_para_plotar:
+            st.line_chart(df_original[colunas_para_plotar])
 
-
-# --- 5. Seção de Potências (com Colunas) ---
-st.header("Potências")
-col_ativa, col_reativa, col_aparente = st.columns(3)
-
-with col_ativa:
-    st.subheader("Ativa (W)")
-    cols_pot_ativa = ['Potência Ativa A', 'Potência Ativa B', 'Potência Ativa C']
-    colunas_para_plotar = filtrar_colunas(cols_pot_ativa, sufixos_selecionados)
-    if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
-
-with col_reativa:
-    st.subheader("Reativa (VAr)")
-    cols_pot_reativa = ['Potência Reativa A', 'Potência Reativa B', 'Potência Reativa C']
-    colunas_para_plotar = filtrar_colunas(cols_pot_reativa, sufixos_selecionados)
-    if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
-        
-with col_aparente:
-    st.subheader("Aparente (VA)")
-    cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
-    colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
-    if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
+    with col_reativa:
+        st.subheader("Reativa (VAr)")
+        cols_pot_reativa = ['Potência Reativa A', 'Potência Reativa B', 'Potência Reativa C']
+        colunas_para_plotar = filtrar_colunas(cols_pot_reativa, sufixos_selecionados)
+        if colunas_para_plotar:
+            st.line_chart(df_original[colunas_para_plotar])
+            
+    with col_aparente:
+        st.subheader("Aparente (VA)")
+        cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
+        colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
+        if colunas_para_plotar:
+            st.line_chart(df_original[colunas_para_plotar])
 
 
 # -----------------------------------------------------------------------
