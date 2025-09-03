@@ -82,6 +82,28 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 elif escolha_pagina == "GERAL":
     st.header("🖥️ Geral")
 
+
+
+    st.header("Análise das Tensões e Correntes")
+
+    col1, col2, col3 = st.columns(2)
+    with col1:
+        st.subheader("Tensões")
+        tab1, tab2 = st.tabs(["Tensão de fase", "Tensão de linha"])
+        with tab1:
+            st.line_chart(chart_data*1.41)
+        with tab2:
+            st.line_chart(chart_data)
+        st.divider()
+
+    with col2:
+        st.subheader("Corrente")
+        st.line_chart(chart_data*0.1)
+        st.divider()
+
+
+    
+
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.subheader("POTÊNCIA ATIVA")
@@ -110,18 +132,6 @@ elif escolha_pagina == "GERAL":
     st.code("st.bar_chart(dados)")
     st.divider()
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        with st.container():
-            st.write("Gráfico 1")
-            st.bar_chart(np.random.randn(20, 3))
-            st.line_chart(np.random.randn(20, 3))
-
-    with col2:
-        with st.container():
-            st.write("Gráfico 2")
-            st.line_chart(np.random.randn(20, 3))
 
 
 # -----------------------------------------------------------------------
