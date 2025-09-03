@@ -103,10 +103,6 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # Gera os dados
     df_original = gerar_dados_timestamp(n_pontos=120, freq='S') # 120 segundos de dados
 
-
-    # --- 2. Widgets de Filtro com Checkboxes ---
-    st.header("Filtro de Fases")
-
     # Cria uma lista vazia para armazenar as fases selecionadas
     fases_selecionadas = []
 
@@ -129,7 +125,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
 
     # --- 3. Filtragem e Plotagem do Gráfico ---
-    st.header("Gráfico de Monitoramento")
+    st.header("Análise de Gráficos")
 
     if not fases_selecionadas:
         st.warning("Por favor, selecione pelo menos uma fase para exibir o gráfico.")
