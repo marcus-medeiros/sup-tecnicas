@@ -145,7 +145,7 @@ elif escolha_pagina == "GERAL":
 
     rel_fp_a = fp_a - media_fp
     rel_fp_b = fp_b - media_fp
-    rel_fp_c = fp_b - media_fp
+    rel_fp_c = fp_c - media_fp
 
 
     col1, col2, col3 = st.columns(3)
