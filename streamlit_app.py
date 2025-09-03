@@ -110,75 +110,17 @@ elif escolha_pagina == "GERAL":
     st.code("st.bar_chart(dados)")
     st.divider()
 
-    st.subheader("`st.pyplot` (com Matplotlib) - CORRIGIDO")
-    st.markdown("Use para total customização. Agora mostrando um gráfico de dispersão para comparar as colunas 'a' e 'b', com a cor baseada na coluna 'c'.")
-    
-    # Criando a figura e os eixos com Matplotlib
-    fig, ax = plt.subplots(figsize=(8, 5))
-    
-    # Criando o gráfico de dispersão (scatter plot)
-    scatter = ax.scatter(
-        chart_data['a'], 
-        chart_data['b'], 
-        c=chart_data['c'], # Usa a coluna 'c' para definir a cor dos pontos
-        cmap='viridis'     # Define um mapa de cores
-    )
-    
-    # Adicionando rótulos, título e uma barra de cores
-    ax.set_xlabel("Eixo A")
-    ax.set_ylabel("Eixo B")
-    ax.set_title("Gráfico de Dispersão Customizado com Matplotlib")
-    ax.grid(True)
-    fig.colorbar(scatter, ax=ax, label="Valor de C")
-    
-    # Exibindo o gráfico no Streamlit
-    st.pyplot(fig)
-    
-    st.code("""
-import matplotlib.pyplot as plt
+    col1, col2 = st.columns(2)
 
-# Criando a figura e os eixos
-fig, ax = plt.subplots()
+    with col1:
+        with st.container():
+            st.write("Gráfico 1")
+            st.bar_chart(np.random.randn(20, 3))
 
-# Criando o gráfico de dispersão
-scatter = ax.scatter(
-    dados['a'], 
-    dados['b'], 
-    c=dados['c'], # Cor baseada na coluna 'c'
-    cmap='viridis'
-)
-
-# Adicionando customizações
-ax.set_xlabel("Eixo A")
-ax.set_ylabel("Eixo B")
-ax.set_title("Gráfico de Dispersão Customizado")
-ax.grid(True)
-fig.colorbar(scatter, ax=ax, label="Valor de C")
-
-# Exibindo no Streamlit
-st.pyplot(fig)
-    """)
-    st.divider()
-    
-    st.subheader("`st.plotly_chart`")
-    st.markdown("Ótimo para gráficos interativos (zoom, pan, tooltips) com poucas linhas de código.")
-    try:
-        import plotly.express as px
-        fig_plotly = px.scatter(
-            chart_data, 
-            x='a', 
-            y='b', 
-            color='c', 
-            title="Gráfico de Dispersão Interativo com Plotly"
-        )
-        st.plotly_chart(fig_plotly, use_container_width=True)
-    except ImportError:
-        st.warning("A biblioteca Plotly não está instalada. Execute: pip install plotly")
-    st.code("""
-import plotly.express as px
-fig = px.scatter(dados, x='a', y='b', color='c')
-st.plotly_chart(fig, use_container_width=True)
-    """)
+    with col2:
+        with st.container():
+            st.write("Gráfico 2")
+            st.line_chart(np.random.randn(20, 3))
 
 
 # -----------------------------------------------------------------------
