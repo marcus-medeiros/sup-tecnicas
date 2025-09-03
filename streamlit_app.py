@@ -98,7 +98,9 @@ elif escolha_pagina == "GERAL":
 
     with col2:
         st.subheader("Corrente")
-        st.markdown("As correntes de fase e linha são iguais, portanto, não há necessário distinção.")
+        st.markdown("""As correntes de fase e linha são iguais, portanto, não há necessário distinção." \
+        
+                    """)
         st.line_chart(chart_data*0.1)
         st.divider()
 
