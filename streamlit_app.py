@@ -107,6 +107,19 @@ elif escolha_pagina == "GERAL":
     st.markdown("Analisando-se as potências, pode-se analisar-se seus valores atuais, estimativas de fator de potência, assim como seus máximos")
 
     st.header("Potências Máximas")
+
+    a_max = 50
+    b_max = 60
+    c_max = 70
+
+    dados = {
+    "Fase": ["A", "B", "C"],
+    "Potência Máxima": [a_max, b_max, c_max],
+    }
+
+    st.table(dados)
+
+
     col1, col2, col3 = st.columns(3)
     col1.metric("Potência Ativa", "1250 W", "1.2 °C")
     col2.metric("Potência Reativa", "800 var", "-8%")
