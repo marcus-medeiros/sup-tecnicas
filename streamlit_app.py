@@ -74,6 +74,22 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
+import streamlit as st
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import matplotlib.pyplot as plt # Importar Matplotlib
+
+# --- Configuração da Página ---
+st.set_page_config(
+    page_title="Dashboard Elétrico - Melhor Distribuição",
+    page_icon="⚡",
+    layout="wide"
+)
+
+st.title("Dashboard de Monitoramento Elétrico - Melhor Visualização")
+st.markdown(f"Exibindo dados gerados em tempo real. Última atualização: {datetime.now().strftime('%H:%M:%S')}")
+
     # --- 1. Geração de Dados Elétricos Complexos ---
     @st.cache_data
     def gerar_dados_eletricos(n_pontos=120, freq='S'):
@@ -83,9 +99,9 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq=freq)
         
         # Gerando dados base com alguma variabilidade
-        tensao_fase_a = np.random.uniform(125, 128, size=n_pontos)
-        tensao_fase_b = np.random.uniform(126, 129, size=n_pontos)
-        tensao_fase_c = np.random.uniform(124, 127, size=n_pontos)
+        tensao_fase_a = np.random.uniform(120, 128, size=n_pontos) # Valores entre 120 e 128
+        tensao_fase_b = np.random.uniform(121, 129, size=n_pontos)
+        tensao_fase_c = np.random.uniform(119, 127, size=n_pontos)
         
         corrente_a = np.random.uniform(10, 12, size=n_pontos)
         corrente_b = np.random.uniform(9, 11, size=n_pontos)
@@ -101,9 +117,10 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
             'Tensão Fase C': tensao_fase_c,
             
             # Tensões de Linha (ex: Fase-Fase, ~ Tensão de Fase * sqrt(3))
-            'Tensão Linha AB': np.random.uniform(218, 222, size=n_pontos),
-            'Tensão Linha BC': np.random.uniform(219, 223, size=n_pontos),
-            'Tensão Linha CA': np.random.uniform(217, 221, size=n_pontos),
+            # Valores de linha entre 208V e 228V, simulando uma rede 220V
+            'Tensão Linha AB': np.random.uniform(215, 225, size=n_pontos),
+            'Tensão Linha BC': np.random.uniform(216, 226, size=n_pontos),
+            'Tensão Linha CA': np.random.uniform(214, 224, size=n_pontos),
             
             # Correntes
             'Corrente A': corrente_a,
@@ -132,6 +149,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
 
     # --- 2. Filtro Principal (Mestre) ---
+    st.header("Filtro Principal de Fases")
     st.markdown("Selecione as fases que deseja visualizar em **todos** os gráficos abaixo.")
 
     sufixos_selecionados = []
@@ -155,32 +173,78 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     st.divider()
 
 
-    # --- 3. Seção de Tensões (com Tabs) ---
-    st.header("Tensões")
-
-    # Helper para filtrar colunas com base nos sufixos
+    # --- Helper para filtrar colunas com base nos sufixos ---
     def filtrar_colunas(todas_as_colunas, sufixos):
         colunas_filtradas = [col for col in todas_as_colunas if col.split()[-1] in sufixos]
         return colunas_filtradas
 
+    # --- Helper para plotar Matplotlib com ylim ajustável ---
+    def plotar_matplotlib(df_data, titulo, y_label, y_min=None, y_max=None):
+        fig, ax = plt.subplots(figsize=(10, 4)) # Ajuste o figsize conforme necessário
+        
+        # Plota cada coluna do DataFrame (cada fase)
+        for col in df_data.columns:
+            ax.plot(df_data.index, df_data[col], label=col)
+        
+        ax.set_title(titulo)
+        ax.set_xlabel("Tempo")
+        ax.set_ylabel(y_label)
+        
+        # ======================================================================
+        # AQUI ESTÁ A MÁGICA: Ajuste do eixo Y (ylim)
+        if y_min is not None and y_max is not None:
+            ax.set_ylim(y_min, y_max)
+        # ======================================================================
+            
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 1)) # Posiciona a legenda fora
+        ax.grid(True, linestyle='--', alpha=0.7)
+        plt.xticks(rotation=45, ha='right') # Rotaciona os labels do X para melhor leitura
+        plt.tight_layout() # Ajusta o layout para evitar cortes
+        st.pyplot(fig) # Exibe o gráfico no Streamlit
+
+
+    # --- 3. Seção de Tensões (com Tabs e Matplotlib) ---
+    st.header("Tensões")
+
     tab_fase, tab_linha = st.tabs(["Tensão de Fase (V)", "Tensão de Linha (V)"])
 
     with tab_fase:
+        st.subheader("Tensão de Fase (V)")
         cols_tensao_fase = ['Tensão Fase A', 'Tensão Fase B', 'Tensão Fase C']
         colunas_para_plotar = filtrar_colunas(cols_tensao_fase, sufixos_selecionados)
         if colunas_para_plotar:
-            st.line_chart(df_original[colunas_para_plotar])
+            df_para_plotar = df_original[colunas_para_plotar]
+            # Chamada da função de plotagem com ylim definido
+            plotar_matplotlib(
+                df_para_plotar, 
+                "Tensões de Fase por Tempo", 
+                "Tensão (V)", 
+                y_min=115, # Ajuste o mínimo para dar zoom
+                y_max=130  # Ajuste o máximo para dar zoom
+            )
+        else:
+            st.info("Nenhuma Tensão de Fase selecionada.")
 
     with tab_linha:
-        # A lógica para tensão de linha é um pouco diferente (AB, BC, CA)
-        # Mostraremos as linhas que contêm os sufixos selecionados
+        st.subheader("Tensão de Linha (V)")
         cols_tensao_linha = ['Tensão Linha AB', 'Tensão Linha BC', 'Tensão Linha CA']
         colunas_para_plotar = [
             col for col in cols_tensao_linha 
             if any(sufixo in col for sufixo in sufixos_selecionados)
         ]
         if colunas_para_plotar:
-            st.line_chart(df_original[colunas_para_plotar])
+            df_para_plotar = df_original[colunas_para_plotar]
+            # Chamada da função de plotagem com ylim definido
+            plotar_matplotlib(
+                df_para_plotar, 
+                "Tensões de Linha por Tempo", 
+                "Tensão (V)", 
+                y_min=210, # Ajuste o mínimo para dar zoom
+                y_max=230  # Ajuste o máximo para dar zoom
+            )
+        else:
+            st.info("Nenhuma Tensão de Linha selecionada.")
+
 
     st.divider()
 
@@ -190,35 +254,53 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     cols_corrente = ['Corrente A', 'Corrente B', 'Corrente C']
     colunas_para_plotar = filtrar_colunas(cols_corrente, sufixos_selecionados)
     if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
+        df_para_plotar = df_original[colunas_para_plotar]
+        plotar_matplotlib(
+            df_para_plotar, 
+            "Correntes por Tempo", 
+            "Corrente (A)", 
+            y_min=8,  # Exemplo de ajuste de ylim para Corrente
+            y_max=15
+        )
+    else:
+        st.info("Nenhuma Corrente selecionada.")
 
     st.divider()
 
 
-    # --- 5. Seção de Potências (com Colunas) ---
+    # --- 5. Seção de Potências (com Colunas e Matplotlib) ---
     st.header("Potências")
-    col_ativa, col_reativa = st.columns(2)
+    col_ativa, col_reativa, col_aparente = st.columns(3)
 
     with col_ativa:
         st.subheader("Ativa (W)")
         cols_pot_ativa = ['Potência Ativa A', 'Potência Ativa B', 'Potência Ativa C']
         colunas_para_plotar = filtrar_colunas(cols_pot_ativa, sufixos_selecionados)
         if colunas_para_plotar:
-            st.line_chart(df_original[colunas_para_plotar])
+            df_para_plotar = df_original[colunas_para_plotar]
+            plotar_matplotlib(df_para_plotar, "", "Potência (W)") # Deixa o ylim automático para potências
+        else:
+            st.info("Nenhuma Potência Ativa selecionada.")
 
     with col_reativa:
         st.subheader("Reativa (VAr)")
         cols_pot_reativa = ['Potência Reativa A', 'Potência Reativa B', 'Potência Reativa C']
         colunas_para_plotar = filtrar_colunas(cols_pot_reativa, sufixos_selecionados)
         if colunas_para_plotar:
-            st.line_chart(df_original[colunas_para_plotar])
+            df_para_plotar = df_original[colunas_para_plotar]
+            plotar_matplotlib(df_para_plotar, "", "Potência (VAr)")
+        else:
+            st.info("Nenhuma Potência Reativa selecionada.")
             
-    st.subheader("Aparente (VA)")
-    cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
-    colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
-    if colunas_para_plotar:
-        st.line_chart(df_original[colunas_para_plotar])
-
+    with col_aparente:
+        st.subheader("Aparente (VA)")
+        cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
+        colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
+        if colunas_para_plotar:
+            df_para_plotar = df_original[colunas_para_plotar]
+            plotar_matplotlib(df_para_plotar, "", "Potência (VA)")
+        else:
+            st.info("Nenhuma Potência Aparente selecionada.")
 
 # -----------------------------------------------------------------------
 # GERAL
