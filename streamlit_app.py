@@ -126,23 +126,21 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     # --- 3. Filtragem e Plotagem do Gráfico ---
     st.header("Análise de Gráficos")
+    st.subheader("Tensões")
 
     if not fases_selecionadas:
         st.warning("Por favor, selecione pelo menos uma fase para exibir o gráfico.")
     else:
-
         # A lógica de filtragem e plotagem é exatamente a mesma de antes
         df_filtrado = df_original[fases_selecionadas]
         
         st.markdown(f"Exibindo dados para: **{', '.join(fases_selecionadas)}**")
-
-        st.subheader("Tensões")
         tab1, tab2 = st.tabs(["Tensão de fase", "Tensão de linha"])
         with tab1:
             st.line_chart(df_filtrado)
         with tab2:
             st.line_chart(df_filtrado*1.41)
-            
+
         st.divider()
         
         with st.expander("Ver tabela de dados completa"):
