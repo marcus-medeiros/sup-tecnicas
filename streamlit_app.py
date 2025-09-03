@@ -74,7 +74,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 # -----------------------------------------------------------------------
 # GERAL
 # -----------------------------------------------------------------------
-elif escolha_pagina == "Geral":
+elif escolha_pagina == "GERAL":
     st.header("🖥️ Geral")
     st.info("Abaixo está contido as informações de forma mais generalizada")
 
