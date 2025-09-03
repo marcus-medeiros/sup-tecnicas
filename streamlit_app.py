@@ -73,8 +73,44 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
+    st.title("Visualizando e Analisando Dados com Fases Distintas")
 
-    st.line_chart(chart_data)
+    # --- 1. Geração dos Dados ---
+    # Função para criar o DataFrame com as 3 fases
+    def gerar_dados_fases(pontos_por_fase=20):
+        # Fase 1: valores entre 120 e 128
+        fase1 = np.random.uniform(120, 128, size=pontos_por_fase)
+        
+        # Fase 2: valores entre 220 e 228
+        fase2 = np.random.uniform(220, 228, size=pontos_por_fase)
+        
+        # Fase 3: valores entre 330 e 337
+        fase3 = np.random.uniform(330, 337, size=pontos_por_fase)
+        
+        # Concatena os valores de todas as fases
+        valores = np.concatenate([fase1, fase2, fase3])
+        
+        # Cria uma coluna para identificar a fase de cada ponto
+        fases = (['Fase 1'] * pontos_por_fase + 
+                ['Fase 2'] * pontos_por_fase + 
+                ['Fase 3'] * pontos_por_fase)
+        
+        # Cria o DataFrame
+        df = pd.DataFrame({
+            'Passo': range(len(valores)),
+            'Fase': fases,
+            'Valor': valores
+        })
+        return df
+
+    # Gera e exibe a tabela de dados
+    df_fases = gerar_dados_fases(pontos_por_fase=20)
+
+    with st.expander("Clique para ver a tabela de dados gerada"):
+        st.dataframe(df_fases)
+
+
+    st.divider()
 
 # -----------------------------------------------------------------------
 # GERAL
