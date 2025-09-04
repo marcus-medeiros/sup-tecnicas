@@ -146,7 +146,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         "15 Minutos": pd.Timedelta(minutes=15),
         "1 Hora": pd.Timedelta(hours=1),
         "6 Horas": pd.Timedelta(hours=6),
-        "24 Horas": pd.Timedelta(hours=24),
+        "24 Horas": pd.Timedelta(hours=24)
     }
     delta_selecionado = deltas[periodo_selecionado]
     inicio_periodo = agora - delta_selecionado
