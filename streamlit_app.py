@@ -143,11 +143,10 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # --- Filtragem por Período ---
     agora = pd.Timestamp.now()
     deltas = {
-        "Últimos 15 Minutos": pd.Timedelta(minutes=15),
-        "Última Hora": pd.Timedelta(hours=1),
-        "Últimas 6 Horas": pd.Timedelta(hours=6),
-        "Últimas 24 Horas": pd.Timedelta(hours=24),
-        "Últimos 2 Dias (Tudo)": pd.Timedelta(days=2)
+        "15 Minutos": pd.Timedelta(minutes=15),
+        "1 Hora": pd.Timedelta(hours=1),
+        "6 Horas": pd.Timedelta(hours=6),
+        "24 Horas": pd.Timedelta(hours=24),
     }
     delta_selecionado = deltas[periodo_selecionado]
     inicio_periodo = agora - delta_selecionado
