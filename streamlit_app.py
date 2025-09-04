@@ -188,7 +188,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         ax.grid(True, linestyle='--', alpha=0.7)
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout(rect=[0, 0, 0.85, 1])
-    st.pyplot(fig)
+        st.pyplot(fig)
 
     # --- Seção de Tensões ---
     st.header("Tensões")
