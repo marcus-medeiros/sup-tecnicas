@@ -111,21 +111,6 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         index=1
     )
 
-    # --- Menu para Formato do Timestamp ---
-    st.subheader("Formato do Eixo X (Tempo)")
-    formatos_data = {
-        "Dia/Mês Hora:Minuto": "%d/%m %H:%M",
-        "Hora:Minuto:Segundo": "%H:%M:%S",
-        "Dia da Semana (Abrev), Hora": "%a, %Hh",
-        "Mês-Dia": "%m-%d",
-    }
-    formato_escolhido_label = st.selectbox(
-        "Escolha o formato da data:",
-        options=list(formatos_data.keys()),
-        index=1
-    )
-    formato_escolhido_str = formatos_data[formato_escolhido_label]
-
     # --- Filtro de Fases Dinâmico ---
     st.subheader("Filtro de Fases")
     sufixos_disponiveis = sorted(list(set([col.split()[-1] for col in df_original.columns if len(col.split()[-1]) == 1])))
@@ -783,3 +768,18 @@ if escolha_pagina == "Outros":
         y_min_c = st.number_input("Mínimo", key="y_min_c", value=8.0, step=0.5, format="%.1f", disabled=auto_corrente)
     with col2_c:
         y_max_c = st.number_input("Máximo", key="y_max_c", value=15.0, step=0.5, format="%.1f", disabled=auto_corrente)
+
+    # --- Menu para Formato do Timestamp ---
+    st.subheader("Formato do Eixo X (Tempo)")
+    formatos_data = {
+        "Dia/Mês Hora:Minuto": "%d/%m %H:%M",
+        "Hora:Minuto:Segundo": "%H:%M:%S",
+        "Dia da Semana (Abrev), Hora": "%a, %Hh",
+        "Mês-Dia": "%m-%d",
+    }
+    formato_escolhido_label = st.selectbox(
+        "Escolha o formato da data:",
+        options=list(formatos_data.keys()),
+        index=1
+    )
+    formato_escolhido_str = formatos_data[formato_escolhido_label]
