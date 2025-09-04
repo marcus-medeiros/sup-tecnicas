@@ -4,6 +4,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from datetime import datetime
+import matplotlib.dates as mdates
 
 chart_data = pd.DataFrame(
         np.random.randn(20, 3),
