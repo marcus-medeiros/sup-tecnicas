@@ -72,87 +72,110 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
-    # --- 1. Geração de Dados Elétricos Complexos ---
+    # --- 1. Geração de Dados Elétricos (com mais dados para o filtro de tempo) ---
     @st.cache_data
-    def gerar_dados_eletricos(n_pontos=120, freq='S'):
+    def gerar_dados_eletricos():
         """
-        Gera um DataFrame completo com dados elétricos para 3 fases.
+        Gera um DataFrame com 2 dias de dados, com frequência de 1 minuto,
+        para que o filtro de período seja significativo.
         """
-        timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq=freq)
+        n_pontos = 2 * 24 * 60 # 2 dias * 24 horas * 60 minutos
+        timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq='T') # 'T' para minutos
         
-        # Gerando dados base com alguma variabilidade
-        tensao_fase_a = np.random.uniform(120, 128, size=n_pontos) # Valores entre 120 e 128
-        tensao_fase_b = np.random.uniform(121, 129, size=n_pontos)
-        tensao_fase_c = np.random.uniform(119, 127, size=n_pontos)
-        
-        corrente_a = np.random.uniform(10, 12, size=n_pontos)
-        corrente_b = np.random.uniform(9, 11, size=n_pontos)
-        corrente_c = np.random.uniform(11, 13, size=n_pontos)
-        
-        # Fator de potência (geralmente entre 0.85 e 0.95)
-        fp = 0.92
-        
+        # Função para gerar uma série temporal com alguma tendência e ruído
+        def gerar_serie(base, amp, n):
+            tendencia = np.linspace(0, amp, n)
+            ruido = np.random.normal(0, amp * 0.1, n)
+            return base + tendencia + ruido
+
         dados = {
-            # Tensões de Fase (ex: Fase-Neutro)
-            'Tensão Fase A': tensao_fase_a,
-            'Tensão Fase B': tensao_fase_b,
-            'Tensão Fase C': tensao_fase_c,
+            'Tensão Fase A': gerar_serie(125, 3, n_pontos),
+            'Tensão Fase B': gerar_serie(126, 2, n_pontos),
+            'Tensão Fase C': gerar_serie(124, 4, n_pontos),
             
-            # Tensões de Linha (ex: Fase-Fase, ~ Tensão de Fase * sqrt(3))
-            # Valores de linha entre 208V e 228V, simulando uma rede 220V
-            'Tensão Linha AB': np.random.uniform(215, 225, size=n_pontos),
-            'Tensão Linha BC': np.random.uniform(216, 226, size=n_pontos),
-            'Tensão Linha CA': np.random.uniform(214, 224, size=n_pontos),
-            
-            # Correntes
-            'Corrente A': corrente_a,
-            'Corrente B': corrente_b,
-            'Corrente C': corrente_c,
-            
-            # Potências (P = V*I*FP, Q = V*I*sin(acos(FP)), S = V*I)
-            'Potência Ativa A': tensao_fase_a * corrente_a * fp,
-            'Potência Ativa B': tensao_fase_b * corrente_b * fp,
-            'Potência Ativa C': tensao_fase_c * corrente_c * fp,
-            
-            'Potência Reativa A': tensao_fase_a * corrente_a * np.sin(np.arccos(fp)),
-            'Potência Reativa B': tensao_fase_b * corrente_b * np.sin(np.arccos(fp)),
-            'Potência Reativa C': tensao_fase_c * corrente_c * np.sin(np.arccos(fp)),
-            
-            'Potência Aparente A': tensao_fase_a * corrente_a,
-            'Potência Aparente B': tensao_fase_b * corrente_b,
-            'Potência Aparente C': tensao_fase_c * corrente_c,
+            'Tensão Linha AB': gerar_serie(218, 4, n_pontos),
+            'Tensão Linha BC': gerar_serie(219, 3, n_pontos),
+            'Tensão Linha CA': gerar_serie(217, 5, n_pontos),
+
+            'Corrente A': gerar_serie(10, 2, n_pontos),
+            'Corrente B': gerar_serie(9, 1.5, n_pontos),
+            'Corrente C': gerar_serie(11, 2.5, n_pontos),
         }
         
-        df = pd.DataFrame(dados, index=timestamps)
-        return df
+        # Adicionando Potências baseadas nos dados gerados
+        fp = 0.92
+        for fase in ['A', 'B', 'C']:
+            dados[f'Potência Ativa {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}'] * fp
+            dados[f'Potência Reativa {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}'] * np.sin(np.arccos(fp))
+            dados[f'Potência Aparente {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}']
 
-    # Gera o DataFrame completo
+        return pd.DataFrame(dados, index=timestamps)
+
     df_original = gerar_dados_eletricos()
 
+    # ==============================================================================
+    # 2. MENU DE CONTROLES NA BARRA LATERAL (SIDEBAR)
+    # ==============================================================================
+    st.header("⚙️ Controles do Dashboard")
 
-    # --- 2. Filtro Principal (Mestre) ---
-    st.header("Filtro Principal de Fases")
-    st.markdown("Selecione as fases que deseja visualizar em **todos** os gráficos abaixo.")
+    # --- NOVO: Filtro de Período ---
+    st.subheader("Período de Visualização")
+    periodo_selecionado = st.selectbox(
+        label="Selecione o período de tempo:",
+        options=[
+            "Últimos 15 Minutos",
+            "Última Hora",
+            "Últimas 6 Horas",
+            "Últimas 24 Horas",
+            "Últimos 2 Dias (Tudo)"
+        ],
+        index=0 # Define "Últimos 15 Minutos" como padrão
+    )
+
+    # --- Filtro de Fases agora é DINÂMICO ---
+    st.subheader("Filtro de Fases")
+    st.markdown("As fases abaixo são detectadas automaticamente dos dados.")
+    
+    # Lógica para encontrar as fases automaticamente (ex: 'A', 'B', 'C')
+    # Pega colunas que terminam com A, B, C, etc. e extrai o último caractere
+    sufixos_disponiveis = sorted(list(set([col.split()[-1] for col in df_original.columns if len(col.split()[-1]) == 1])))
 
     sufixos_selecionados = []
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        if st.checkbox('Fase A', value=True, key='fase_a'):
-            sufixos_selecionados.append('A')
-    with col2:
-        if st.checkbox('Fase B', value=True, key='fase_b'):
-            sufixos_selecionados.append('B')
-    with col3:
-        if st.checkbox('Fase C', value=True, key='fase_c'):
-            sufixos_selecionados.append('C')
-
-    # Se nenhuma fase for selecionada, exibe um aviso e para a execução.
-    if not sufixos_selecionados:
-        st.warning("Por favor, selecione pelo menos uma fase para visualizar os dados.")
-        st.stop() # Interrompe a renderização do restante da página
+    cols_filtro = st.columns(len(sufixos_disponiveis))
+    for i, sufixo in enumerate(sufixos_disponiveis):
+        with cols_filtro[i]:
+            if st.checkbox(f'Fase {sufixo}', value=True, key=f'fase_{sufixo}'):
+                sufixos_selecionados.append(sufixo)
 
     st.divider()
+
+    # ==============================================================================
+    # 3. LÓGICA DE FILTRAGEM
+    # ==============================================================================
+
+    # --- Passo 1: Filtrar o DataFrame pelo PERÍODO selecionado ---
+    agora = datetime.now()
+    if periodo_selecionado == "Últimos 15 Minutos":
+        delta = pd.Timedelta(minutes=15)
+    elif periodo_selecionado == "Última Hora":
+        delta = pd.Timedelta(hours=1)
+    elif periodo_selecionado == "Últimas 6 Horas":
+        delta = pd.Timedelta(hours=6)
+    elif periodo_selecionado == "Últimas 24 Horas":
+        delta = pd.Timedelta(hours=24)
+    else: # "Últimos 2 Dias (Tudo)"
+        delta = pd.Timedelta(days=2)
+
+    inicio_periodo = agora - delta
+    df_filtrado_tempo = df_original[df_original.index >= inicio_periodo]
+
+    st.markdown(f"Exibindo dados dos **{periodo_selecionado}**. Período: `{inicio_periodo.strftime('%d/%m %H:%M')}` a `{agora.strftime('%d/%m %H:%M')}`")
+
+
+    # --- Passo 2: Verificar se alguma FASE foi selecionada ---
+    if not sufixos_selecionados:
+        st.warning("Por favor, selecione pelo menos uma fase na barra lateral para visualizar os dados.")
+        st.stop()
 
 
     # --- Helper para filtrar colunas com base nos sufixos ---
@@ -739,57 +762,6 @@ elif escolha_pagina == "Status e Progresso":
     if col2.button("Mostrar neve ❄️"):
         st.snow()
 
-# -----------------------------------------------------------------------
-# OTIMIZAÇÃO E ESTADO
-# -----------------------------------------------------------------------
-elif escolha_pagina == "Otimização e Estado":
-    st.header("⚡ Otimização e Gerenciamento de Estado")
-
-    st.subheader("`st.cache_data` e `st.cache_resource`")
-    st.markdown("""
-    - `st.cache_data`: Usado para armazenar em cache resultados de funções que retornam dados (DataFrames, JSON, etc.). O Streamlit verifica os parâmetros da função e o conteúdo do corpo da função para decidir se re-executa.
-    - `st.cache_resource`: Usado para armazenar em cache recursos globais que não devem ser recriados a cada execução (conexões com banco de dados, modelos de ML).
-    """)
-    st.code("""
-@st.cache_data
-def carregar_dataframe(url):
-    # Código para carregar dados
-    return df
-
-@st.cache_resource
-def carregar_modelo_ml():
-    # Código para carregar um modelo pesado
-    return modelo
-    """)
-    st.info("Já estamos usando `@st.cache_data` na função `carregar_dados()` no topo deste script!")
-
-    st.divider()
-
-    st.subheader("`st.session_state`")
-    st.markdown("Um objeto tipo dicionário para armazenar o estado da sessão entre as interações do usuário.")
-
-    # Inicializa o contador no estado da sessão se ele não existir
-    if 'contador' not in st.session_state:
-        st.session_state.contador = 0
-
-    st.write("Valor atual do contador:", st.session_state.contador)
-    
-    col1, col2 = st.columns(2)
-    if col1.button("Incrementar +1"):
-        st.session_state.contador += 1
-        st.rerun() # Opcional, força o rerrodar imediato
-
-    if col2.button("Resetar contador"):
-        st.session_state.contador = 0
-        st.rerun()
-    
-    st.code("""
-if 'contador' not in st.session_state:
-    st.session_state.contador = 0
-
-if st.button("Incrementar"):
-    st.session_state.contador += 1
-    """)
 
 # -----------------------------------------------------------------------
 # Outros
