@@ -234,15 +234,25 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     # --- 5. Seção de Potências (com Colunas e Matplotlib) ---
     st.header("Potências")
-    col_ativa, col_reativa = st.columns(2)
+    # ### CORREÇÃO DE LAYOUT: Mudei para 3 colunas para acomodar todos os gráficos ###
+    col_ativa, col_reativa, col_aparente = st.columns(3)
 
     with col_ativa:
         st.subheader("Ativa (W)")
         cols_pot_ativa = ['Potência Ativa A', 'Potência Ativa B', 'Potência Ativa C']
         colunas_para_plotar = filtrar_colunas(cols_pot_ativa, sufixos_selecionados)
         if colunas_para_plotar:
-            df_para_plotar = df_original[colunas_para_plotar]
-            plotar_matplotlib(df_para_plotar, "", "Potência (W)") # Deixa o ylim automático para potências
+            # ### CORREÇÃO 1: Usar o DataFrame filtrado por tempo ###
+            df_para_plotar = df_filtrado_tempo[colunas_para_plotar]
+            
+            # ### CORREÇÃO 2: Passar o formato da data ###
+            plotar_matplotlib(
+                df_para_plotar, 
+                "", 
+                "Potência (W)", 
+                auto=True, # Deixando o eixo Y automático para potências
+                date_format=formato_escolhido_str
+            )
         else:
             st.info("Nenhuma Potência Ativa selecionada.")
 
@@ -251,19 +261,38 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         cols_pot_reativa = ['Potência Reativa A', 'Potência Reativa B', 'Potência Reativa C']
         colunas_para_plotar = filtrar_colunas(cols_pot_reativa, sufixos_selecionados)
         if colunas_para_plotar:
-            df_para_plotar = df_original[colunas_para_plotar]
-            plotar_matplotlib(df_para_plotar, "", "Potência (VAr)")
+            # ### CORREÇÃO 1: Usar o DataFrame filtrado por tempo ###
+            df_para_plotar = df_filtrado_tempo[colunas_para_plotar]
+            
+            # ### CORREÇÃO 2: Passar o formato da data ###
+            plotar_matplotlib(
+                df_para_plotar, 
+                "", 
+                "Potência (VAr)", 
+                auto=True,
+                date_format=formato_escolhido_str
+            )
         else:
             st.info("Nenhuma Potência Reativa selecionada.")
             
-    st.subheader("Aparente (VA)")
-    cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
-    colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
-    if colunas_para_plotar:
-        df_para_plotar = df_original[colunas_para_plotar]
-        plotar_matplotlib(df_para_plotar, "", "Potência (VA)")
-    else:
-        st.info("Nenhuma Potência Aparente selecionada.")
+    with col_aparente:
+        st.subheader("Aparente (VA)")
+        cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
+        colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
+        if colunas_para_plotar:
+            # ### CORREÇÃO 1: Usar o DataFrame filtrado por tempo ###
+            df_para_plotar = df_filtrado_tempo[colunas_para_plotar]
+            
+            # ### CORREÇÃO 2: Passar o formato da data ###
+            plotar_matplotlib(
+                df_para_plotar, 
+                "", 
+                "Potência (VA)", 
+                auto=True,
+                date_format=formato_escolhido_str
+            )
+        else:
+            st.info("Nenhuma Potência Aparente selecionada.")
 
 # -----------------------------------------------------------------------
 # GERAL
