@@ -118,19 +118,28 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # ==============================================================================
     st.header("⚙️ Controles do Dashboard")
 
-    # --- NOVO: Filtro de Período ---
+    # --- Filtro de Período ---
     st.subheader("Período de Visualização")
     periodo_selecionado = st.selectbox(
-        label="Selecione o período de tempo:",
-        options=[
-            "Últimos 15 Minutos",
-            "Última Hora",
-            "Últimas 6 Horas",
-            "Últimas 24 Horas",
-            "Últimos 2 Dias (Tudo)"
-        ],
-        index=0 # Define "Últimos 15 Minutos" como padrão
+        label="Selecione o período:",
+        options=["Últimos 15 Minutos", "Última Hora", "Últimas 6 Horas", "Últimas 24 Horas", "Últimos 2 Dias (Tudo)"],
+        index=1
     )
+
+    # --- NOVO: Menu para Formato do Timestamp ---
+    st.subheader("Formato do Eixo X (Tempo)")
+    formatos_data = {
+        "Dia/Mês Hora:Minuto": "%d/%m %H:%M",
+        "Hora:Minuto:Segundo": "%H:%M:%S",
+        "Dia da Semana (Abrev), Hora": "%a, %Hh",
+        "Mês-Dia": "%m-%d",
+    }
+    formato_escolhido_label = st.selectbox(
+        "Escolha o formato da data:",
+        options=list(formatos_data.keys()),
+        index=0
+    )
+    formato_escolhido_str = formatos_data[formato_escolhido_label]
 
     # --- Filtro de Fases agora é DINÂMICO ---
     st.subheader("Filtro de Fases")
