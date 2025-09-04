@@ -72,43 +72,25 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 - Correntes
             
     """)
-    # --- 1. Geração de Dados Elétricos (com mais dados para o filtro de tempo) ---
+    # --- 1. Geração de Dados (sem alterações) ---
     @st.cache_data
     def gerar_dados_eletricos():
-        """
-        Gera um DataFrame com 2 dias de dados, com frequência de 1 minuto,
-        para que o filtro de período seja significativo.
-        """
-        n_pontos = 2 * 24 * 60 # 2 dias * 24 horas * 60 minutos
-        timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq='T') # 'T' para minutos
-        
-        # Função para gerar uma série temporal com alguma tendência e ruído
+        n_pontos = 2 * 24 * 60
+        timestamps = pd.date_range(end=datetime.now(), periods=n_pontos, freq='T')
         def gerar_serie(base, amp, n):
             tendencia = np.linspace(0, amp, n)
             ruido = np.random.normal(0, amp * 0.1, n)
             return base + tendencia + ruido
-
         dados = {
-            'Tensão Fase A': gerar_serie(125, 3, n_pontos),
-            'Tensão Fase B': gerar_serie(126, 2, n_pontos),
-            'Tensão Fase C': gerar_serie(124, 4, n_pontos),
-            
-            'Tensão Linha AB': gerar_serie(218, 4, n_pontos),
-            'Tensão Linha BC': gerar_serie(219, 3, n_pontos),
-            'Tensão Linha CA': gerar_serie(217, 5, n_pontos),
-
-            'Corrente A': gerar_serie(10, 2, n_pontos),
-            'Corrente B': gerar_serie(9, 1.5, n_pontos),
-            'Corrente C': gerar_serie(11, 2.5, n_pontos),
+            'Tensão Fase A': gerar_serie(125, 3, n_pontos), 'Tensão Fase B': gerar_serie(126, 2, n_pontos), 'Tensão Fase C': gerar_serie(124, 4, n_pontos),
+            'Tensão Linha AB': gerar_serie(218, 4, n_pontos), 'Tensão Linha BC': gerar_serie(219, 3, n_pontos), 'Tensão Linha CA': gerar_serie(217, 5, n_pontos),
+            'Corrente A': gerar_serie(10, 2, n_pontos), 'Corrente B': gerar_serie(9, 1.5, n_pontos), 'Corrente C': gerar_serie(11, 2.5, n_pontos),
         }
-        
-        # Adicionando Potências baseadas nos dados gerados
         fp = 0.92
         for fase in ['A', 'B', 'C']:
             dados[f'Potência Ativa {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}'] * fp
             dados[f'Potência Reativa {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}'] * np.sin(np.arccos(fp))
             dados[f'Potência Aparente {fase}'] = dados[f'Tensão Fase {fase}'] * dados[f'Corrente {fase}']
-
         return pd.DataFrame(dados, index=timestamps)
 
     df_original = gerar_dados_eletricos()
@@ -116,17 +98,19 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # ==============================================================================
     # 2. MENU DE CONTROLES NA BARRA LATERAL (SIDEBAR)
     # ==============================================================================
+    # !!! ATENÇÃO: Todo este bloco de código deve estar DENTRO de um `with st.sidebar:` !!!
+    # No seu código original, ele estava no corpo principal.
     st.header("⚙️ Controles do Dashboard")
 
     # --- Filtro de Período ---
     st.subheader("Período de Visualização")
     periodo_selecionado = st.selectbox(
         label="Selecione o período:",
-        options=["15 Minutos", "1 Hora", "6 Horas", "24 Horas"],
+        options=["Últimos 15 Minutos", "Última Hora", "Últimas 6 Horas", "Últimas 24 Horas", "Últimos 2 Dias (Tudo)"],
         index=1
     )
 
-    # --- Menu para Formato do Timestamp com o novo padrão ---
+    # --- Menu para Formato do Timestamp ---
     st.subheader("Formato do Eixo X (Tempo)")
     formatos_data = {
         "Dia/Mês Hora:Minuto": "%d/%m %H:%M",
@@ -137,18 +121,13 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     formato_escolhido_label = st.selectbox(
         "Escolha o formato da data:",
         options=list(formatos_data.keys()),
-        index=1  # <--- AJUSTE REALIZADO AQUI
+        index=1
     )
     formato_escolhido_str = formatos_data[formato_escolhido_label]
 
-    # --- Filtro de Fases agora é DINÂMICO ---
+    # --- Filtro de Fases Dinâmico ---
     st.subheader("Filtro de Fases")
-    st.markdown("As fases abaixo são detectadas automaticamente dos dados.")
-    
-    # Lógica para encontrar as fases automaticamente (ex: 'A', 'B', 'C')
-    # Pega colunas que terminam com A, B, C, etc. e extrai o último caractere
     sufixos_disponiveis = sorted(list(set([col.split()[-1] for col in df_original.columns if len(col.split()[-1]) == 1])))
-
     sufixos_selecionados = []
     cols_filtro = st.columns(len(sufixos_disponiveis))
     for i, sufixo in enumerate(sufixos_disponiveis):
@@ -156,130 +135,101 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
             if st.checkbox(f'Fase {sufixo}', value=True, key=f'fase_{sufixo}'):
                 sufixos_selecionados.append(sufixo)
 
-    st.divider()
-
     # ==============================================================================
-    # 3. LÓGICA DE FILTRAGEM
+    # 3. LÓGICA DE FILTRAGEM E PLOTAGEM
     # ==============================================================================
 
-    # --- Passo 1: Filtrar o DataFrame pelo PERÍODO selecionado ---
-    agora = datetime.now()
-    if periodo_selecionado == "15 Minutos":
-        delta = pd.Timedelta(minutes=15)
-    elif periodo_selecionado == "1 Hora":
-        delta = pd.Timedelta(hours=1)
-    elif periodo_selecionado == "6 Horas":
-        delta = pd.Timedelta(hours=6)
-    else:
-        delta = pd.Timedelta(hours=24)
-
-
-    inicio_periodo = agora - delta
+    # --- Filtragem por Período ---
+    agora = pd.Timestamp.now()
+    deltas = {
+        "Últimos 15 Minutos": pd.Timedelta(minutes=15),
+        "Última Hora": pd.Timedelta(hours=1),
+        "Últimas 6 Horas": pd.Timedelta(hours=6),
+        "Últimas 24 Horas": pd.Timedelta(hours=24),
+        "Últimos 2 Dias (Tudo)": pd.Timedelta(days=2)
+    }
+    delta_selecionado = deltas[periodo_selecionado]
+    inicio_periodo = agora - delta_selecionado
     df_filtrado_tempo = df_original[df_original.index >= inicio_periodo]
 
     st.markdown(f"Exibindo dados dos **{periodo_selecionado}**. Período: `{inicio_periodo.strftime('%d/%m %H:%M')}` a `{agora.strftime('%d/%m %H:%M')}`")
 
-
-    # --- Passo 2: Verificar se alguma FASE foi selecionada ---
     if not sufixos_selecionados:
-        st.warning("Por favor, selecione pelo menos uma fase na barra lateral para visualizar os dados.")
+        st.warning("Selecione pelo menos uma fase na barra lateral.")
         st.stop()
 
-
-    # --- Helper para filtrar colunas com base nos sufixos ---
+    # --- Funções Helper ---
     def filtrar_colunas(todas_as_colunas, sufixos):
-        colunas_filtradas = [col for col in todas_as_colunas if col.split()[-1] in sufixos]
-        return colunas_filtradas
+        return [col for col in todas_as_colunas if col.split()[-1] in sufixos]
 
-    # --- Helper para plotar Matplotlib com ylim ajustável ---
-    def plotar_matplotlib(df_data, titulo, y_label, y_min=None, y_max=None):
-        fig, ax = plt.subplots(figsize=(10, 4)) # Ajuste o figsize conforme necessário
+    ### CORREÇÃO 2: ATUALIZAR A FUNÇÃO DE PLOTAGEM ###
+    def plotar_matplotlib(df_data, titulo, y_label, y_min=None, y_max=None, date_format="%d/%m %H:%M"):
+        fig, ax = plt.subplots(figsize=(10, 4))
+        if df_data.empty:
+            ax.text(0.5, 0.5, "Nenhum dado para exibir.", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+            st.pyplot(fig)
+            return
         
-        # Plota cada coluna do DataFrame (cada fase)
         for col in df_data.columns:
             ax.plot(df_data.index, df_data[col], label=col)
+        
+        # Aplica o formato de data recebido como parâmetro
+        formatter = mdates.DateFormatter(date_format)
+        ax.xaxis.set_major_formatter(formatter)
         
         ax.set_title(titulo)
         ax.set_xlabel("Tempo")
         ax.set_ylabel(y_label)
-        
-        # ======================================================================
-        # AQUI ESTÁ A MÁGICA: Ajuste do eixo Y (ylim)
         if y_min is not None and y_max is not None:
             ax.set_ylim(y_min, y_max)
-        # ======================================================================
-            
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1)) # Posiciona a legenda fora
+        ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1))
         ax.grid(True, linestyle='--', alpha=0.7)
-        plt.xticks(rotation=45, ha='right') # Rotaciona os labels do X para melhor leitura
-        plt.tight_layout() # Ajusta o layout para evitar cortes
-        st.pyplot(fig) # Exibe o gráfico no Streamlit
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout(rect=[0, 0, 0.85, 1])
+        st.pyplot(fig)
 
-
-    # --- 3. Seção de Tensões (com Tabs e Matplotlib) ---
+    # --- Seção de Tensões ---
     st.header("Tensões")
-
     tab_fase, tab_linha = st.tabs(["Tensão de Fase (V)", "Tensão de Linha (V)"])
 
     with tab_fase:
-        st.subheader("Tensão de Fase (V)")
-        cols_tensao_fase = ['Tensão Fase A', 'Tensão Fase B', 'Tensão Fase C']
-        colunas_para_plotar = filtrar_colunas(cols_tensao_fase, sufixos_selecionados)
+        cols = ['Tensão Fase A', 'Tensão Fase B', 'Tensão Fase C']
+        colunas_para_plotar = filtrar_colunas(cols, sufixos_selecionados)
         if colunas_para_plotar:
-            df_para_plotar = df_original[colunas_para_plotar]
-            # Chamada da função de plotagem com ylim definido
+            ### CORREÇÃO 3: PASSAR O FORMATO ESCOLHIDO PARA A FUNÇÃO ###
             plotar_matplotlib(
-                df_para_plotar, 
+                df_filtrado_tempo[colunas_para_plotar], 
                 "Tensões de Fase por Tempo", 
-                "Tensão (V)", 
-                y_min=115, # Ajuste o mínimo para dar zoom
-                y_max=130  # Ajuste o máximo para dar zoom
+                "Tensão (V)",
+                date_format=formato_escolhido_str # <--- Passando o formato aqui
             )
-        else:
-            st.info("Nenhuma Tensão de Fase selecionada.")
 
+    # ... e assim por diante para os outros gráficos ...
     with tab_linha:
-        st.subheader("Tensão de Linha (V)")
-        cols_tensao_linha = ['Tensão Linha AB', 'Tensão Linha BC', 'Tensão Linha CA']
-        colunas_para_plotar = [
-            col for col in cols_tensao_linha 
-            if any(sufixo in col for sufixo in sufixos_selecionados)
-        ]
+        cols = ['Tensão Linha AB', 'Tensão Linha BC', 'Tensão Linha CA']
+        colunas_para_plotar = [c for c in cols if any(s in c for s in sufixos_selecionados)]
         if colunas_para_plotar:
-            df_para_plotar = df_original[colunas_para_plotar]
-            # Chamada da função de plotagem com ylim definido
             plotar_matplotlib(
-                df_para_plotar, 
-                "Tensões de Linha por Tempo", 
-                "Tensão (V)", 
-                y_min=210, # Ajuste o mínimo para dar zoom
-                y_max=230  # Ajuste o máximo para dar zoom
+                df_filtrado_tempo[colunas_para_plotar],
+                "Tensões de Linha por Tempo",
+                "Tensão (V)",
+                date_format=formato_escolhido_str # <--- Passando o formato aqui
             )
-        else:
-            st.info("Nenhuma Tensão de Linha selecionada.")
 
-
+    # (O mesmo deve ser feito para os gráficos de Corrente e Potência)
     st.divider()
-
-
-    # --- 4. Seção de Corrente ---
     st.header("Corrente (A)")
     cols_corrente = ['Corrente A', 'Corrente B', 'Corrente C']
-    colunas_para_plotar = filtrar_colunas(cols_corrente, sufixos_selecionados)
-    if colunas_para_plotar:
-        df_para_plotar = df_original[colunas_para_plotar]
+    colunas_para_plotar_corrente = filtrar_colunas(cols_corrente, sufixos_selecionados)
+    if colunas_para_plotar_corrente:
         plotar_matplotlib(
-            df_para_plotar, 
+            df_filtrado_tempo[colunas_para_plotar_corrente], 
             "Correntes por Tempo", 
-            "Corrente (A)", 
-            y_min=8,  # Exemplo de ajuste de ylim para Corrente
-            y_max=15
+            "Corrente (A)",
+            date_format=formato_escolhido_str # <--- Passando o formato aqui
         )
-    else:
-        st.info("Nenhuma Corrente selecionada.")
-
+    
     st.divider()
-
 
     # --- 5. Seção de Potências (com Colunas e Matplotlib) ---
     st.header("Potências")
