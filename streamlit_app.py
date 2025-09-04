@@ -122,11 +122,11 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     st.subheader("Período de Visualização")
     periodo_selecionado = st.selectbox(
         label="Selecione o período:",
-        options=["Últimos 15 Minutos", "Última Hora", "Últimas 6 Horas", "Últimas 24 Horas", "Últimos 2 Dias (Tudo)"],
+        options=["15 Minutos", "1 Hora", "6 Horas", "24 Horas"],
         index=1
     )
 
-    # --- NOVO: Menu para Formato do Timestamp ---
+    # --- Menu para Formato do Timestamp com o novo padrão ---
     st.subheader("Formato do Eixo X (Tempo)")
     formatos_data = {
         "Dia/Mês Hora:Minuto": "%d/%m %H:%M",
@@ -137,7 +137,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     formato_escolhido_label = st.selectbox(
         "Escolha o formato da data:",
         options=list(formatos_data.keys()),
-        index=0
+        index=1  # <--- AJUSTE REALIZADO AQUI
     )
     formato_escolhido_str = formatos_data[formato_escolhido_label]
 
@@ -164,16 +164,15 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
 
     # --- Passo 1: Filtrar o DataFrame pelo PERÍODO selecionado ---
     agora = datetime.now()
-    if periodo_selecionado == "Últimos 15 Minutos":
+    if periodo_selecionado == "15 Minutos":
         delta = pd.Timedelta(minutes=15)
-    elif periodo_selecionado == "Última Hora":
+    elif periodo_selecionado == "1 Hora":
         delta = pd.Timedelta(hours=1)
-    elif periodo_selecionado == "Últimas 6 Horas":
+    elif periodo_selecionado == "6 Horas":
         delta = pd.Timedelta(hours=6)
-    elif periodo_selecionado == "Últimas 24 Horas":
+    else:
         delta = pd.Timedelta(hours=24)
-    else: # "Últimos 2 Dias (Tudo)"
-        delta = pd.Timedelta(days=2)
+
 
     inicio_periodo = agora - delta
     df_filtrado_tempo = df_original[df_original.index >= inicio_periodo]
