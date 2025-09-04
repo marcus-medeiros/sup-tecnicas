@@ -125,7 +125,8 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         options=list(formatos_data.keys()),
         index=1
     )
-    formato_escolhido_str = formatos_data[formato_escolhido_label]
+    
+    formato_escolhido_str = formatos_data["%H:%M:%S"]
 
     # --- Filtro de Fases Dinâmico ---
     st.subheader("Filtro de Fases")
