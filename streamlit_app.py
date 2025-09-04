@@ -236,7 +236,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     # --- 5. Seção de Potências (com Colunas e Matplotlib) ---
     st.header("Potências")
     # ### CORREÇÃO DE LAYOUT: Mudei para 3 colunas para acomodar todos os gráficos ###
-    col_ativa, col_reativa, col_aparente = st.columns(3)
+    col_ativa, col_reativa = st.columns(2)
 
     with col_ativa:
         st.subheader("Ativa (W)")
@@ -276,24 +276,23 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         else:
             st.info("Nenhuma Potência Reativa selecionada.")
             
-    with col_aparente:
-        st.subheader("Aparente (VA)")
-        cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
-        colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
-        if colunas_para_plotar:
-            # ### CORREÇÃO 1: Usar o DataFrame filtrado por tempo ###
-            df_para_plotar = df_filtrado_tempo[colunas_para_plotar]
-            
-            # ### CORREÇÃO 2: Passar o formato da data ###
-            plotar_matplotlib(
-                df_para_plotar, 
-                "", 
-                "Potência (VA)", 
-                auto=True,
-                date_format=formato_escolhido_str
-            )
-        else:
-            st.info("Nenhuma Potência Aparente selecionada.")
+    st.subheader("Aparente (VA)")
+    cols_pot_aparente = ['Potência Aparente A', 'Potência Aparente B', 'Potência Aparente C']
+    colunas_para_plotar = filtrar_colunas(cols_pot_aparente, sufixos_selecionados)
+    if colunas_para_plotar:
+        # ### CORREÇÃO 1: Usar o DataFrame filtrado por tempo ###
+        df_para_plotar = df_filtrado_tempo[colunas_para_plotar]
+        
+        # ### CORREÇÃO 2: Passar o formato da data ###
+        plotar_matplotlib(
+            df_para_plotar, 
+            "", 
+            "Potência (VA)", 
+            auto=True,
+            date_format=formato_escolhido_str
+        )
+    else:
+        st.info("Nenhuma Potência Aparente selecionada.")
 
 # -----------------------------------------------------------------------
 # GERAL
