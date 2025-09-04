@@ -107,7 +107,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
     st.subheader("Período de Visualização")
     periodo_selecionado = st.selectbox(
         label="Selecione o período:",
-        options=["Últimos 15 Minutos", "Última Hora", "Últimas 6 Horas", "Últimas 24 Horas", "Últimos 2 Dias (Tudo)"],
+        options=["15 Minutos", "1 Hora", "6 Horas", "24 Horas"],
         index=1
     )
 
