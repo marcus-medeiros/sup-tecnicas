@@ -163,7 +163,7 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         return [col for col in todas_as_colunas if col.split()[-1] in sufixos]
 
     ### CORREÇÃO 2: ATUALIZAR A FUNÇÃO DE PLOTAGEM ###
-    def plotar_matplotlib(df_data, titulo, y_label, y_min=None, y_max=None, date_format="%d/%m %H:%M"):
+    def plotar_matplotlib(df_data, titulo, y_label, date_format="%d/%m %H:%M", y_min=None, y_max=None, auto=False):
         fig, ax = plt.subplots(figsize=(10, 4))
         if df_data.empty:
             ax.text(0.5, 0.5, "Nenhum dado para exibir.", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
@@ -173,20 +173,22 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         for col in df_data.columns:
             ax.plot(df_data.index, df_data[col], label=col)
         
-        # Aplica o formato de data recebido como parâmetro
         formatter = mdates.DateFormatter(date_format)
         ax.xaxis.set_major_formatter(formatter)
         
         ax.set_title(titulo)
         ax.set_xlabel("Tempo")
         ax.set_ylabel(y_label)
-        if y_min is not None and y_max is not None:
+        
+        # A lógica agora verifica se o modo 'auto' NÃO está ativado para definir os limites
+        if not auto and y_min is not None and y_max is not None:
             ax.set_ylim(y_min, y_max)
+            
         ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1))
         ax.grid(True, linestyle='--', alpha=0.7)
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout(rect=[0, 0, 0.85, 1])
-        st.pyplot(fig)
+    st.pyplot(fig)
 
     # --- Seção de Tensões ---
     st.header("Tensões")
