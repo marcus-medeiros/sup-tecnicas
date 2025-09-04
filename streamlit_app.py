@@ -120,11 +120,14 @@ Dentre as grandezas básicas monitoradas por um sistema deste tipo são:
         "Mês-Dia": "%m-%d",
     }
     
-    formato_escolhido_label = st.selectbox(
-        "Escolha o formato da data:",
-        options=list(formatos_data.keys()),
-        index=1
-    )
+    #
+    #formato_escolhido_label = st.selectbox(
+    #    "Escolha o formato da data:",
+    #    options=list(formatos_data.keys()),
+    #    index=1
+    #)
+
+    
     formato_escolhido_str = formatos_data["Hora:Minuto:Segundo"]
 
     # --- Filtro de Fases Dinâmico ---
